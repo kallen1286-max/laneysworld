@@ -1,0 +1,30 @@
+name: Lint & Validate Edge Functions
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Deno Lint & Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Lint
+        run: deno lint supabase/functions/
+
+      - name: Type Check
+        run: deno check supabase/functions/make-server-6b4cfc8d/index.tsx
+
+      - name: Verify imports resolve
+        run: deno info supabase/functions/make-server-6b4cfc8d/index.tsx
