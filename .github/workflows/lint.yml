@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   lint:
     name: Deno Lint & Type Check
@@ -21,10 +25,120 @@ jobs:
           deno-version: v2.x
 
       - name: Lint
-        run: deno lint supabase/functions/
+        id: lint
+        run: |
+          echo "## Deno Lint" >> $GITHUB_STEP_SUMMARY
+          if deno lint supabase/functions/ 2>&1 | tee /tmp/lint.txt; then
+            echo "lint_passed=true" >> $GITHUB_OUTPUT
+            echo "✅ No lint issues found." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "lint_passed=false" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/lint.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
 
       - name: Type Check
-        run: deno check supabase/functions/make-server-6b4cfc8d/index.tsx
+        id: typecheck
+        run: |
+          echo "## Type Check" >> $GITHUB_STEP_SUMMARY
+          if deno check supabase/functions/make-server-6b4cfc8d/index.tsx 2>&1 | tee /tmp/typecheck.txt; then
+            echo "typecheck_passed=true" >> $GITHUB_OUTPUT
+            echo "✅ No type errors found." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "typecheck_passed=false" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/typecheck.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
 
       - name: Verify imports resolve
-        run: deno info supabase/functions/make-server-6b4cfc8d/index.tsx
+        id: imports
+        run: |
+          echo "## Import Validation" >> $GITHUB_STEP_SUMMARY
+          if deno info supabase/functions/make-server-6b4cfc8d/index.tsx 2>&1 | tee /tmp/imports.txt; then
+            echo "imports_passed=true" >> $GITHUB_OUTPUT
+            echo "✅ All imports resolved." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "imports_passed=false" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/imports.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const lint = '${{ steps.lint.outputs.lint_passed }}' === 'true';
+            const typecheck = '${{ steps.typecheck.outputs.typecheck_passed }}' === 'true';
+            const imports = '${{ steps.imports.outputs.imports_passed }}' === 'true';
+            const allPassed = lint && typecheck && imports;
+
+            const lintOutput = fs.readFileSync('/tmp/lint.txt', 'utf8').trim();
+            const typecheckOutput = fs.readFileSync('/tmp/typecheck.txt', 'utf8').trim();
+            const importsOutput = fs.readFileSync('/tmp/imports.txt', 'utf8').trim();
+
+            let body = allPassed
+              ? `## ✅ Edge Function Validation Passed\n\n`
+              : `## ❌ Edge Function Validation Failed\n\n`;
+
+            body += `| Check | Status |\n|-------|--------|\n`;
+            body += `| Deno Lint | ${lint ? '✅ Passed' : '❌ Failed'} |\n`;
+            body += `| Type Check | ${typecheck ? '✅ Passed' : '❌ Failed'} |\n`;
+            body += `| Import Validation | ${imports ? '✅ Passed' : '❌ Failed'} |\n\n`;
+
+            if (!lint) {
+              body += `<details><summary>Lint output</summary>\n\n\`\`\`\n${lintOutput}\n\`\`\`\n</details>\n\n`;
+            }
+            if (!typecheck) {
+              body += `<details><summary>Type check output</summary>\n\n\`\`\`\n${typecheckOutput}\n\`\`\`\n</details>\n\n`;
+            }
+            if (!imports) {
+              body += `<details><summary>Import validation output</summary>\n\n\`\`\`\n${importsOutput}\n\`\`\`\n</details>\n\n`;
+            }
+
+            body += `\n---\n*Delaney's World CI · \`make-server-6b4cfc8d\`*`;
+
+            // Find and update existing bot comment, or create new one
+            const marker = '<!-- laneysworld-lint-bot -->';
+            body = marker + '\n' + body;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Fail if any check failed
+        if: steps.lint.outputs.lint_passed != 'true' || steps.typecheck.outputs.typecheck_passed != 'true' || steps.imports.outputs.imports_passed != 'true'
+        run: |
+          echo "One or more checks failed:"
+          [ "${{ steps.lint.outputs.lint_passed }}" != "true" ] && echo "  - Lint failed"
+          [ "${{ steps.typecheck.outputs.typecheck_passed }}" != "true" ] && echo "  - Type check failed"
+          [ "${{ steps.imports.outputs.imports_passed }}" != "true" ] && echo "  - Import validation failed"
+          exit 1
