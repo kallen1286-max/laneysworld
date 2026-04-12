@@ -15,7 +15,7 @@ A charity website raising awareness and funding for BPAN (Beta-propeller Protein
 | **Frontend** | Figma Make (Figma Sites) | Static site hosted via `sites.figma.net` |
 | **Backend** | Supabase Edge Functions | Hono framework on Deno runtime |
 | **Database** | Supabase Postgres | `kv_store_6b4cfc8d` table (key-value) |
-| **Email** | Resend API | Custom domain `laneysworld.com` |
+| **Email** | Resend API | Scoped API key, custom domain `laneysworld.com` |
 | **DNS** | Porkbun | Nameservers: `*.ns.porkbun.com` |
 | **Analytics** | Google Analytics | GA4 ID: `G-BJL7K6S6PC` |
 
@@ -31,7 +31,8 @@ A charity website raising awareness and funding for BPAN (Beta-propeller Protein
 - **Slug:** `make-server-6b4cfc8d`
 - **Runtime:** Deno (Supabase Edge Runtime)
 - **Framework:** Hono
-- **Current version:** 8 (deployed April 11, 2026)
+- **Current version:** 11
+- **JWT Verification:** ON (legacy secret — anon key satisfies)
 
 ---
 
@@ -82,7 +83,7 @@ Set in **Supabase Dashboard → Edge Functions → Secrets**:
 |----------|-------------|
 | `SUPABASE_URL` | Auto-injected by Supabase |
 | `SUPABASE_SERVICE_ROLE_KEY` | Auto-injected by Supabase |
-| `RESEND_API_KEY` | Resend API key for sending email notifications |
+| `RESEND_API_KEY` | Scoped Resend key for `laneysworld.com` **only** (isolated from TradeEscape) |
 
 See `.env.example` for reference.
 
@@ -96,19 +97,30 @@ See `.env.example` for reference.
 - **API endpoint:** `https://api.resend.com/emails`
 - **Dashboard:** [resend.com/emails](https://resend.com/emails)
 
+### API Key Isolation
+
+As of April 12, 2026, LaneysWorld and TradeEscape use **separate Resend API keys** scoped to their respective domains:
+
+| Project | Resend API Key Scope | Domain |
+|---------|---------------------|--------|
+| LaneysWorld | Sending access only | `laneysworld.com` |
+| TradeEscape | Separate key | `tradeescape.com` |
+
+This prevents cross-domain sending. To rotate the LaneysWorld key: create a new key at [resend.com/api-keys](https://resend.com/api-keys) scoped to `laneysworld.com`, then update `RESEND_API_KEY` in the Supabase edge function secrets.
+
 ### Email Template
 
 Notification emails include:
+- Branded header: "📬 New Message — Delaney's World" with blue accent bar (`#2563eb`)
 - Sender name and email (with mailto link)
 - Full message text in a styled blue card
 - Feedback ID and timestamp (Eastern time)
-- Branded header: "📬 New Message — Delaney's World"
 
 ---
 
 ## DNS Configuration (Porkbun)
 
-Last verified: April 11, 2026
+Last verified: April 12, 2026
 
 ### Core Records
 
@@ -178,6 +190,11 @@ RLS is enabled on this table. The edge function uses the service role key to byp
 - **Fix:** Updated `to` address to `kallen1286@gmail.com` in edge function v8.
 - **Full report:** [Google Doc — Incident Report](https://docs.google.com/document/d/1duFnRUBQSqE-wonEq8vaOxEVv-MuapFzOTzrMSVu5G0/edit)
 
+### April 12, 2026 — Resend API Key Isolation
+
+- **Issue:** LaneysWorld and TradeEscape shared a single Resend API key. A queued v7 email was delivered from `support@tradeescape.com` instead of `updates@laneysworld.com`.
+- **Fix:** Created a dedicated Resend API key scoped to `laneysworld.com` sending only. Updated `RESEND_API_KEY` secret in Supabase. Projects are now fully isolated.
+
 ---
 
 ## File Structure
@@ -187,12 +204,22 @@ laneysworld/
 ├── README.md
 ├── .env.example
 ├── .gitignore
+├── .github/
+│   └── workflows/
+│       └── lint.yml              # CI: Deno lint, type check, import validation
 └── supabase/
     └── functions/
         └── make-server-6b4cfc8d/
             ├── index.tsx          # Main edge function (Hono server)
             └── kv_store.tsx       # KV store interface (Supabase Postgres)
 ```
+
+### Branch Protection
+
+- **GitHub Ruleset:** "Protect main — require CI" (ID: 14955287)
+- All changes to `main` must go through a PR
+- Required status check: `Deno Lint & Type Check` must pass
+- PR comments posted automatically with pass/fail table and expandable error details
 
 ---
 
