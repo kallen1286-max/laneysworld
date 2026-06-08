@@ -6,7 +6,9 @@ import { ScienceFlowchart } from './components/science-flowchart';
 import { AnimatedPoem } from './components/animated-poem';
 import { Heart, Brain, Star, Instagram, X, Facebook, BookOpen, Dna, Microscope, Hospital, MapPin, Phone, Mail, ExternalLink, AlertTriangle, XCircle, ArrowRight, Stethoscope, BookMarked, MessageSquare, Share2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import delaneyImage from 'figma:asset/baca29e45cf7b6e63fc5697c0a32bbee46e4de93.png';
+// Original Figma export referenced baca29e45...png, which was not included in the asset bundle.
+// Reusing the existing "Delaney with dad" hero image for the JSON-LD schema metadata below.
+import delaneyImage from 'figma:asset/b2d2fff468f3870a27738c2bbc25204d46bf33c0.png';
 import delaneyKitchenImage from 'figma:asset/7cf5676660f7d2bb8e0409466faeb6216b7fdfa0.png';
 import delaneyFamBeachImage from 'figma:asset/a0137830d447550abbced25778ec2fd623466fa1.png';
 import delaneyFacePaintImage from 'figma:asset/73bf55c703ceaf90081eabc8dff6b452e231341c.png';

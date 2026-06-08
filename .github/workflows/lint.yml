@@ -3,8 +3,14 @@ name: Lint & Validate Edge Functions
 on:
   push:
     branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/lint.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/lint.yml'
 
 permissions:
   contents: read
