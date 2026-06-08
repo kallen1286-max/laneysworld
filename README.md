@@ -248,4 +248,14 @@ If migrating off Figma Make to a custom frontend (e.g., Vite + React + Tailwind)
 
 ---
 
+## Running the Frontend Locally
+
+This repo includes the frontend code bundle for Delaney's World website. The original design is available at https://www.figma.com/design/hf6blT8slJwCBQ9AnP6INT/Delaney%E2%80%99s-World-website.
+
+Run `npm i` to install the dependencies.
+
+Run `npm run dev` to start the development server.
+
+---
+
 *Delaney's World — Her joy is contagious. Her fight deserves action.*
