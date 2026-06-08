@@ -1,8 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// dist/ is produced by `vite build` at the repo root, one level above server/.
+const distDir = path.resolve(__dirname, '..', 'dist');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const NOTIFICATION_TO =
+  process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
 
 app.use(cors());
 app.use(express.json());
@@ -77,7 +86,7 @@ app.post('/feedback', async (req, res) => {
         },
         body: JSON.stringify({
           from: "Delaney's World <updates@laneysworld.com>",
-          to: ['updates@laneysworld.com'],
+          to: [NOTIFICATION_TO],
           reply_to: senderEmail,
           subject: `New message from ${displayName} — Delaney's World`,
           html: emailHtml,
@@ -106,6 +115,19 @@ app.post('/feedback', async (req, res) => {
   }
 });
 
+// Serve the Vite-built frontend from dist/ when it exists (production).
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir, { maxAge: '1h', index: false }));
+  // SPA fallback: anything that isn't /health or /feedback gets index.html
+  app.get(/^\/(?!health$|feedback$).*/, (_req, res) => {
+    res.sendFile(path.join(distDir, 'index.html'));
+  });
+  console.log(`Serving static frontend from ${distDir}`);
+} else {
+  console.warn(`dist/ not found at ${distDir} — running API only.`);
+}
+
 app.listen(PORT, () => {
-  console.log(`Laneysworld API listening on port ${PORT}`);
+  console.log(`Laneysworld server listening on port ${PORT}`);
+  console.log(`Feedback notifications -> ${NOTIFICATION_TO}`);
 });

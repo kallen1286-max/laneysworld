@@ -6,7 +6,8 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "start": "node server/index.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

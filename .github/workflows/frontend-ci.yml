@@ -3,28 +3,8 @@ name: Frontend Build
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'index.html'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'vite.config.ts'
-      - 'postcss.config.mjs'
-      - 'default_shadcn_theme.css'
-      - '.github/workflows/frontend-ci.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'index.html'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'vite.config.ts'
-      - 'postcss.config.mjs'
-      - 'default_shadcn_theme.css'
-      - '.github/workflows/frontend-ci.yml'
 
 permissions:
   contents: read
