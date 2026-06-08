@@ -36,3 +36,10 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Vite / frontend build
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
