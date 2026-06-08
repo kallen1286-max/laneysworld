@@ -1,0 +1,5 @@
+# robots.txt for Delaney's World — https://www.laneysworld.com
+User-agent: *
+Allow: /
+
+Sitemap: https://www.laneysworld.com/sitemap.xml
