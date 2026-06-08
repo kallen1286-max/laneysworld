@@ -1,22 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Laney&#39;s World</title>
-      <meta name="description" content="This web application offers enhanced user engagement through comprehensive analytics tracking, optimizing link interactions and improving SEO performance." />
-      <meta name="robots" content="noindex, nofollow" />
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
-      
-    </head>
+    <title>Delaney's World — Fighting BPAN through gene therapy research</title>
+    <meta
+      name="description"
+      content="Delaney's World is a family-led mission to accelerate gene therapy research for BPAN (Beta-propeller Protein-Associated Neurodegeneration), an ultra-rare neurodegenerative disease affecting children worldwide."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="canonical" href="https://www.laneysworld.com/" />
 
-    <body>
-      
-      <div id="root"></div>
-      <script type="module" src="/src/main.tsx"></script>
-      
-    </body>
-  </html>
-  
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Delaney's World" />
+    <meta property="og:url" content="https://www.laneysworld.com/" />
+    <meta property="og:title" content="Delaney's World — Fighting BPAN through gene therapy research" />
+    <meta
+      property="og:description"
+      content="Help accelerate gene therapy research for BPAN, an ultra-rare neurodegenerative disease. Delaney's joy is contagious; her fight deserves action."
+    />
+    <meta property="og:image" content="https://www.laneysworld.com/og-image.jpg" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://www.laneysworld.com/" />
+    <meta name="twitter:title" content="Delaney's World — Fighting BPAN through gene therapy research" />
+    <meta
+      name="twitter:description"
+      content="Help accelerate gene therapy research for BPAN, an ultra-rare neurodegenerative disease."
+    />
+    <meta name="twitter:image" content="https://www.laneysworld.com/og-image.jpg" />
+
+    <!-- Performance hints -->
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+
+    <!-- Structured data: NonprofitOrganization + Person -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "NGO",
+            "@id": "https://www.laneysworld.com/#org",
+            "name": "Delaney's World",
+            "alternateName": "Laney's World",
+            "url": "https://www.laneysworld.com/",
+            "logo": "https://www.laneysworld.com/logo.png",
+            "description": "Family-led initiative raising awareness and funding for gene therapy research targeting BPAN (Beta-propeller Protein-Associated Neurodegeneration).",
+            "knowsAbout": [
+              {
+                "@type": "MedicalCondition",
+                "name": "Beta-propeller Protein-Associated Neurodegeneration",
+                "alternateName": "BPAN",
+                "code": {
+                  "@type": "MedicalCode",
+                  "codeValue": "WDR45",
+                  "codingSystem": "Gene symbol"
+                },
+                "associatedAnatomy": { "@type": "AnatomicalStructure", "name": "Brain" },
+                "epidemiology": "Ultra-rare; ~500 confirmed cases worldwide.",
+                "cause": "De novo mutations in the WDR45 gene on the X chromosome."
+              }
+            ],
+            "sameAs": []
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.laneysworld.com/#delaney",
+            "name": "Delaney",
+            "givenName": "Delaney",
+            "description": "Two-year-old child living with BPAN, whose journey inspired the founding of Delaney's World.",
+            "subjectOf": { "@id": "https://www.laneysworld.com/#org" }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.laneysworld.com/#website",
+            "url": "https://www.laneysworld.com/",
+            "name": "Delaney's World",
+            "publisher": { "@id": "https://www.laneysworld.com/#org" },
+            "inLanguage": "en-US"
+          }
+        ]
+      }
+    </script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      #root {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

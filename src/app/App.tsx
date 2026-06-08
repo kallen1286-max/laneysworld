@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
@@ -23,10 +23,16 @@ import laneysWorldLogo from 'figma:asset/098025f9056d201a154be344dcf4936569c2526
 import { researchArticles, lastUpdated } from './data/research-articles';
 import { Link } from './components/ui/link';
 import { Toaster } from './components/ui/sonner';
-import { FeedbackModal } from './components/FeedbackModal';
 import { trackEvent } from './utils/analytics';
 import { LiteYouTube } from './components/LiteYouTube';
-import { PrivacyPolicy } from './components/PrivacyPolicy';
+// Lazy: only loaded when the user opens the feedback form or navigates to /privacy.
+// Trims ~25KB off the initial JS bundle and defers the work for low-bandwidth clients.
+const FeedbackModal = lazy(() =>
+  import('./components/FeedbackModal').then((m) => ({ default: m.FeedbackModal })),
+);
+const PrivacyPolicy = lazy(() =>
+  import('./components/PrivacyPolicy').then((m) => ({ default: m.PrivacyPolicy })),
+);
 import { toast } from 'sonner@2.0.3';
 
 // Donation URL
@@ -734,7 +740,11 @@ export default function App() {
 
   // ── Route: /privacy ─────────────────────────────────────────────────────
   if (currentPath === '/privacy') {
-    return <PrivacyPolicy onBack={() => navigateTo('/')} />;
+    return (
+      <Suspense fallback={<div style={{ padding: 24, fontFamily: 'sans-serif' }}>Loading…</div>}>
+        <PrivacyPolicy onBack={() => navigateTo('/')} />
+      </Suspense>
+    );
   }
 
   return (
@@ -2261,7 +2271,11 @@ export default function App() {
       </footer>
 
       {/* Feedback Modal */}
-      <FeedbackModal isOpen={showFeedback} onClose={() => setShowFeedback(false)} openedFrom={feedbackOpenedFrom} />
+      {showFeedback && (
+        <Suspense fallback={null}>
+          <FeedbackModal isOpen={showFeedback} onClose={() => setShowFeedback(false)} openedFrom={feedbackOpenedFrom} />
+        </Suspense>
+      )}
       <Toaster position="bottom-center" richColors />
 
       {/* Video Transcript Modal */}
