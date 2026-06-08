@@ -159,14 +159,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         {/* ── Section 3 ── */}
         <Section id="storage" icon={<Lock className="h-5 w-5" />} title="3. Data Storage & Security">
           <p>
-            Feedback form submissions are stored in <strong>Supabase</strong>, a SOC 2 Type II compliant
-            cloud database provider with servers located in the United States. Data is encrypted at rest and
-            in transit (TLS 1.2+).
-          </p>
-          <p>
-            Outbound notification emails are delivered via <strong>Resend</strong>, a transactional email
-            service. Email content includes your name, email address, and message. Resend retains delivery
-            logs for up to 30 days.
+            Feedback form submissions are delivered directly as email notifications via{' '}
+            <strong>Resend</strong>, a transactional email service, and are not persisted to a database.
+            Email content includes your name, email address, and message. Resend retains delivery logs for
+            up to 30 days. All transmission is encrypted in transit (TLS 1.2+).
           </p>
           <p>
             While we take reasonable precautions to protect your data, no internet transmission is 100%
@@ -200,11 +196,6 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 name: 'GoFundMe',
                 use: 'Donation processing. Clicking "Donate Now" takes you to GoFundMe\'s platform, governed entirely by their privacy policy.',
                 link: 'https://www.gofundme.com/en-us/privacy',
-              },
-              {
-                name: 'Supabase',
-                use: 'Database storage for feedback form submissions.',
-                link: 'https://supabase.com/privacy',
               },
               {
                 name: 'Resend',

@@ -12,37 +12,26 @@ A charity website raising awareness and funding for BPAN (Beta-propeller Protein
 
 | Layer | Technology | Details |
 |-------|-----------|---------|
-| **Frontend** | Figma Make (Figma Sites) | Static site hosted via `sites.figma.net` |
-| **Backend** | Supabase Edge Functions | Hono framework on Deno runtime |
-| **Database** | Supabase Postgres | `kv_store_6b4cfc8d` table (key-value) |
+| **Frontend** | Vite + React 18 + TypeScript | Tailwind CSS 4, Radix UI, lucide-react, Motion |
+| **Backend** | Node.js + Express | `server/index.mjs` — feedback endpoint, calls Resend directly |
 | **Email** | Resend API | Scoped API key, custom domain `laneysworld.com` |
+| **Hosting** | Railway | Auto-deploys from `main` via Railpack |
 | **DNS** | Porkbun | Nameservers: `*.ns.porkbun.com` |
 | **Analytics** | Google Analytics | GA4 ID: `G-BJL7K6S6PC` |
 
-### Supabase
-
-- **Project:** Delaney's World website
-- **Project ID:** `gzphjcwligemkrnhtvec`
-- **Region:** us-east-1
-- **Dashboard:** [supabase.com/dashboard/project/gzphjcwligemkrnhtvec](https://supabase.com/dashboard/project/gzphjcwligemkrnhtvec)
-
-### Edge Function
-
-- **Slug:** `make-server-6b4cfc8d`
-- **Runtime:** Deno (Supabase Edge Runtime)
-- **Framework:** Hono
-- **Current version:** 11
-- **JWT Verification:** ON (legacy secret — anon key satisfies)
+The site previously ran on Figma Sites + a Supabase edge function. As of June 2026, both have been removed in favor of a single repo containing the Vite frontend and a small Express backend that talks to Resend directly.
 
 ---
 
-## Edge Function Endpoints
+## Backend Endpoints
 
-### `GET /make-server-6b4cfc8d/health`
+Implemented in `server/index.mjs`.
+
+### `GET /health`
 
 Health check. Returns `{ "status": "ok" }`.
 
-### `POST /make-server-6b4cfc8d/feedback`
+### `POST /feedback`
 
 Accepts user feedback from the site's contact form.
 
@@ -64,26 +53,20 @@ Accepts user feedback from the site's contact form.
 **What happens:**
 1. Validates `email` and `feedback` are present
 2. Generates a unique `feedbackId` (`feedback_{timestamp}_{random}`)
-3. Stores the entry in `kv_store_6b4cfc8d` via Supabase Postgres
-4. Sends an HTML notification email via Resend to `kallen1286@gmail.com`
-5. Returns `{ success: true, message: "Thank you for your message!", feedbackId }`
+3. Sends an HTML notification email via Resend to `kallen1286@gmail.com`
+4. Returns `{ success: true, message: "Thank you for your message!", feedbackId }`
 
-**Full endpoint URL:**
-```
-https://gzphjcwligemkrnhtvec.supabase.co/functions/v1/make-server-6b4cfc8d/feedback
-```
+> Feedback is no longer persisted to a database — it is dispatched directly as email. If long-term storage is needed later, wire up Railway Postgres or any other store inside `/feedback`.
 
 ---
 
 ## Environment Variables
 
-Set in **Supabase Dashboard → Edge Functions → Secrets**:
-
-| Variable | Description |
-|----------|-------------|
-| `SUPABASE_URL` | Auto-injected by Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Auto-injected by Supabase |
-| `RESEND_API_KEY` | Scoped Resend key for `laneysworld.com` **only** (isolated from TradeEscape) |
+| Variable | Where | Description |
+|----------|-------|-------------|
+| `RESEND_API_KEY` | Backend (Railway) | Scoped Resend key for `laneysworld.com` **only** (isolated from TradeEscape) |
+| `PORT` | Backend (Railway) | Defaults to `3001` locally; Railway sets this automatically |
+| `VITE_API_URL` | Frontend (build time) | Base URL of the backend, e.g. `https://laneysworld.up.railway.app`. Leave empty to call same-origin. |
 
 See `.env.example` for reference.
 
@@ -106,7 +89,7 @@ As of April 12, 2026, LaneysWorld and TradeEscape use **separate Resend API keys
 | LaneysWorld | Sending access only | `laneysworld.com` |
 | TradeEscape | Separate key | `tradeescape.com` |
 
-This prevents cross-domain sending. To rotate the LaneysWorld key: create a new key at [resend.com/api-keys](https://resend.com/api-keys) scoped to `laneysworld.com`, then update `RESEND_API_KEY` in the Supabase edge function secrets.
+This prevents cross-domain sending. To rotate the LaneysWorld key: create a new key at [resend.com/api-keys](https://resend.com/api-keys) scoped to `laneysworld.com`, then update `RESEND_API_KEY` in the Railway service variables.
 
 ### Email Template
 
@@ -129,6 +112,8 @@ Last verified: April 12, 2026
 | A | `laneysworld.com` | `204.69.207.1` | 600 |
 | CNAME | `www.laneysworld.com` | `sites.figma.net` | 600 |
 
+> The `www` CNAME still points at `sites.figma.net`. Once the Railway deployment is verified, swap this to the Railway-provided CNAME and remove the Figma verification TXT record.
+
 ### Email (Resend)
 
 | Type | Host | Value | TTL | Purpose |
@@ -144,7 +129,7 @@ Last verified: April 12, 2026
 | Type | Host | Value | TTL | Purpose |
 |------|------|-------|-----|---------|
 | MX | `laneysworld.com` | `inbound-smtp.us-east-1.amazonaws.com` (prio 10) | 600 | AWS SES inbound (no active mailbox) |
-| TXT | `_figma_sites_verify_www.laneysworld.com` | Figma Sites verification token | 600 | Domain ownership for Figma |
+| TXT | `_figma_sites_verify_www.laneysworld.com` | Figma Sites verification token | 600 | Domain ownership for Figma — can be removed after Railway cutover |
 | TXT | `_acme-challenge.laneysworld.com` | Two ACME challenge tokens | 600 | SSL certificate provisioning |
 
 ### Recommended DNS Additions
@@ -155,30 +140,61 @@ Last verified: April 12, 2026
 
 ---
 
-## Database Schema
+## File Structure
 
-### `kv_store_6b4cfc8d`
-
-```sql
-CREATE TABLE kv_store_6b4cfc8d (
-  key TEXT NOT NULL PRIMARY KEY,
-  value JSONB NOT NULL
-);
+```
+laneysworld/
+├── README.md
+├── .env.example
+├── .gitignore
+├── package.json              # Vite frontend, pnpm@9.15.9
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── vite.config.ts
+├── postcss.config.mjs
+├── index.html
+├── default_shadcn_theme.css
+├── src/                      # React + TypeScript app
+│   ├── main.tsx
+│   ├── app/
+│   ├── assets/
+│   └── styles/
+├── server/                   # Express backend
+│   ├── package.json
+│   └── index.mjs             # /health and /feedback
+└── .github/
+    └── workflows/
+        └── frontend-ci.yml   # CI: pnpm install + vite build, sticky bot PR comments
 ```
 
-Feedback entries are stored with key format `feedback_{timestamp}_{random}` and value:
+### Branch Protection
 
-```json
-{
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "feedback": "Message text here",
-  "timestamp": 1775932376650,
-  "source": "delaneys_world"
-}
+- **GitHub Ruleset:** "Protect main — require CI" (ID: 14955287)
+- All changes to `main` must go through a PR
+- Required status check: `Vite Build` must pass
+
+---
+
+## Deployment
+
+### Railway
+
+The repo auto-deploys to Railway on every push to `main`. Railpack reads `packageManager: pnpm@9.15.9` from `package.json`, installs with pnpm, and runs the configured build/deploy commands.
+
+### Local Development
+
+```bash
+# Install dependencies (pnpm required — see packageManager in package.json)
+pnpm install
+
+# Run the Vite dev server
+pnpm dev
+
+# In a separate terminal, run the Express backend
+cd server && node index.mjs
 ```
 
-RLS is enabled on this table. The edge function uses the service role key to bypass RLS.
+Set `VITE_API_URL=http://localhost:3001` in a `.env` file at the repo root to point the frontend at the local backend during development.
 
 ---
 
@@ -193,68 +209,11 @@ RLS is enabled on this table. The edge function uses the service role key to byp
 ### April 12, 2026 — Resend API Key Isolation
 
 - **Issue:** LaneysWorld and TradeEscape shared a single Resend API key. A queued v7 email was delivered from `support@tradeescape.com` instead of `updates@laneysworld.com`.
-- **Fix:** Created a dedicated Resend API key scoped to `laneysworld.com` sending only. Updated `RESEND_API_KEY` secret in Supabase. Projects are now fully isolated.
+- **Fix:** Created a dedicated Resend API key scoped to `laneysworld.com` sending only. Projects are now fully isolated.
 
----
+### June 8, 2026 — Migration off Figma Sites + Supabase
 
-## File Structure
-
-```
-laneysworld/
-├── README.md
-├── .env.example
-├── .gitignore
-├── .github/
-│   └── workflows/
-│       └── lint.yml              # CI: Deno lint, type check, import validation
-└── supabase/
-    └── functions/
-        └── make-server-6b4cfc8d/
-            ├── index.tsx          # Main edge function (Hono server)
-            └── kv_store.tsx       # KV store interface (Supabase Postgres)
-```
-
-### Branch Protection
-
-- **GitHub Ruleset:** "Protect main — require CI" (ID: 14955287)
-- All changes to `main` must go through a PR
-- Required status check: `Deno Lint & Type Check` must pass
-- PR comments posted automatically with pass/fail table and expandable error details
-
----
-
-## Deployment
-
-The edge function is deployed via the Supabase dashboard or CLI:
-
-```bash
-supabase functions deploy make-server-6b4cfc8d --project-ref gzphjcwligemkrnhtvec
-```
-
-The frontend is managed in Figma and published via Figma Sites. DNS CNAME for `www` points to `sites.figma.net`.
-
----
-
-## Future Migration Notes
-
-If migrating off Figma Make to a custom frontend (e.g., Vite + React + Tailwind):
-
-1. Scaffold new project, rebuild the single-page layout
-2. Reuse the same Supabase edge function endpoint — no backend changes needed
-3. Deploy frontend to Railway/Vercel/Netlify
-4. Update `www.laneysworld.com` CNAME from `sites.figma.net` to new host
-5. Move GA4 snippet (`G-BJL7K6S6PC`) to new codebase
-6. Verify SSL, test feedback form, confirm email delivery
-
----
-
-## Running the Frontend Locally
-
-This repo includes the frontend code bundle for Delaney's World website. The original design is available at https://www.figma.com/design/hf6blT8slJwCBQ9AnP6INT/Delaney%E2%80%99s-World-website.
-
-Run `npm i` to install the dependencies.
-
-Run `npm run dev` to start the development server.
+- **Change:** Replaced Figma Sites frontend with the Vite/React app committed in PR #2. Removed the Supabase edge function (`make-server-6b4cfc8d`) and `kv_store_6b4cfc8d` table entirely; the feedback endpoint now lives in `server/index.mjs` and calls Resend directly. Hosting moved to Railway.
 
 ---
 
