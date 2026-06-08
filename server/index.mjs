@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
@@ -13,8 +14,48 @@ const PORT = process.env.PORT || 3001;
 const NOTIFICATION_TO =
   process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
 
+// Security headers. Content-Security-Policy is hand-tuned for the resources this
+// page actually uses: Google Analytics, YouTube nocookie embed, Resend API, and
+// inline styles produced by Vite/Tailwind. Tighten further when new third-party
+// scripts are removed or replaced.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'default-src': ["'self'"],
+        'base-uri': ["'self'"],
+        'object-src': ["'none'"],
+        'frame-ancestors': ["'none'"],
+        'img-src': ["'self'", 'data:', 'https://i.ytimg.com', 'https://www.google-analytics.com'],
+        'media-src': ["'self'"],
+        'script-src': [
+          "'self'",
+          "'unsafe-inline'", // Vite injects a small inline bootstrap; Tailwind also occasionally inlines
+          'https://www.googletagmanager.com',
+          'https://www.google-analytics.com',
+        ],
+        'connect-src': [
+          "'self'",
+          'https://www.google-analytics.com',
+          'https://region1.google-analytics.com',
+          'https://api.resend.com',
+        ],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'font-src': ["'self'", 'data:'],
+        'frame-src': ['https://www.youtube-nocookie.com', 'https://www.youtube.com'],
+        'upgrade-insecure-requests': [],
+      },
+    },
+    // Allow embedding YouTube iframes — Helmet's COEP would block them.
+    crossOriginEmbedderPolicy: false,
+    // Permissive opener policy so the GoFundMe link in a new tab works cleanly.
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  }),
+);
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '32kb' }));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
@@ -117,9 +158,31 @@ app.post('/feedback', async (req, res) => {
 
 // Serve the Vite-built frontend from dist/ when it exists (production).
 if (fs.existsSync(distDir)) {
-  app.use(express.static(distDir, { maxAge: '1h', index: false }));
+  // Hashed assets under /assets/* are content-addressed by Vite, so we can
+  // safely tell browsers/CDNs to cache them for a year. index.html itself is
+  // served with a short TTL so users always pick up the latest deployment.
+  app.use(
+    '/assets',
+    express.static(path.join(distDir, 'assets'), {
+      maxAge: '1y',
+      immutable: true,
+      index: false,
+    }),
+  );
+  app.use(
+    express.static(distDir, {
+      maxAge: '5m',
+      index: false,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('index.html')) {
+          res.setHeader('Cache-Control', 'no-cache');
+        }
+      },
+    }),
+  );
   // SPA fallback: anything that isn't /health or /feedback gets index.html
   app.get(/^\/(?!health$|feedback$).*/, (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(path.join(distDir, 'index.html'));
   });
   console.log(`Serving static frontend from ${distDir}`);
