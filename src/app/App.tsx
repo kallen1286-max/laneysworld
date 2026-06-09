@@ -23,7 +23,7 @@ import laneysWorldLogo from 'figma:asset/098025f9056d201a154be344dcf4936569c2526
 import { researchArticles, lastUpdated } from './data/research-articles';
 import { Link } from './components/ui/link';
 import { Toaster } from './components/ui/sonner';
-import { trackEvent } from './utils/analytics';
+import { trackEvent, trackPageView } from './utils/analytics';
 import { LiteYouTube } from './components/LiteYouTube';
 // Lazy: only loaded when the user opens the feedback form or navigates to /privacy.
 // Trims ~25KB off the initial JS bundle and defers the work for low-bandwidth clients.
@@ -119,6 +119,13 @@ export default function App() {
     window.addEventListener('popstate', handlePop);
     return () => window.removeEventListener('popstate', handlePop);
   }, []);
+
+  // First-party page_view emission. GA4 auto-fires its own page_view
+  // (send_page_view: true), so trackPageView only writes to /e — no
+  // double-counting in GA4.
+  useEffect(() => {
+    trackPageView({ page_path: currentPath, page_title: document.title });
+  }, [currentPath]);
 
   // ── Share handler — Web Share API with clipboard fallback ────────────────
   const shareStory = async () => {
