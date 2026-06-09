@@ -5,7 +5,7 @@ interface PrivacyPolicyProps {
   onBack: () => void;
 }
 
-const EFFECTIVE_DATE = 'March 16, 2026';
+const EFFECTIVE_DATE = 'June 9, 2026';
 const CONTACT_EMAIL = 'updates@laneysworld.com';
 const SITE_NAME = "Delaney's World";
 const ORG_NAME = "Don't Forget Me Foundation";
@@ -133,12 +133,23 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <li><strong>Message content</strong> — your feedback, question, or note</li>
           </ul>
           <p className="mt-3"><strong>B. Information collected automatically (Analytics)</strong></p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Pages visited and scroll depth (via Google Analytics 4)</li>
-            <li>Referring website, browser type, and operating system</li>
-            <li>General geographic region (country/city level — IP addresses are anonymized by GA4 before storage)</li>
-            <li>Session duration and user interactions (button clicks, video plays)</li>
+          <p className="mt-1">
+            We operate two analytics systems in parallel: a <strong>first-party analytics database</strong>
+            we run ourselves (no third-party involved), and <strong>Google Analytics 4</strong>. Both honor
+            the Global Privacy Control (GPC) and Do Not Track (DNT) browser signals — when either is on, we
+            do not set our analytics cookie and we record no activity.
+          </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li>Pages visited, sections viewed, and scroll depth</li>
+            <li>Button clicks (donate, share, external links) and video play / completion milestones</li>
+            <li>Referring website, UTM tags, browser family, and device type (mobile / tablet / desktop)</li>
+            <li>An anonymous random identifier (UUID) stored in a first-party cookie so we can group events into sessions</li>
           </ul>
+          <p className="mt-2">
+            We do <strong>not</strong> store IP addresses, full User-Agent strings, precise location, fingerprints,
+            or any data that can identify you personally. The anonymous identifier is not linked to any name,
+            email, or account.
+          </p>
           <p className="mt-3">We do <strong>not</strong> collect payment information, government IDs, health
           records, or any other sensitive personal data. Donations are processed entirely by GoFundMe's
           secure platform.</p>
@@ -246,6 +257,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {[
+                  { name: 'anon_id', purpose: 'First-party — anonymous random ID so we can group events into sessions. Not set if GPC or DNT is on.', duration: '1 year' },
                   { name: '_ga', purpose: 'Google Analytics — distinguishes unique users', duration: '2 years' },
                   { name: '_ga_XXXXXXXX', purpose: 'Google Analytics — session state for GA4', duration: '2 years' },
                   { name: 'YouTube cookies', purpose: 'Set only when you click the video play button', duration: 'Session / up to 180 days' },
@@ -261,7 +273,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
           </div>
           <p className="mt-3">
             We do <strong>not</strong> use advertising cookies, cross-site tracking pixels, or retargeting
-            tags. You can opt out of Google Analytics at any time using Google's{' '}
+            tags. <strong>We honor Global Privacy Control (GPC) and Do Not Track (DNT)</strong> — if either
+            signal is set in your browser, we do not set our <code className="bg-gray-100 px-1 rounded text-xs">anon_id</code>{' '}
+            cookie and we record no analytics activity at all. You can also opt out of Google Analytics at any
+            time using Google's{' '}
             <a
               href="https://tools.google.com/dlpage/gaoptout"
               target="_blank"
@@ -326,6 +341,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         {/* ── Section 8 ── */}
         <Section id="retention" icon={<Trash2 className="h-5 w-5" />} title="8. Data Retention">
           <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>First-party analytics events:</strong> Raw event rows are retained for{' '}
+              <strong>90 days</strong>, then automatically purged by a daily cleanup job. Aggregated counts
+              (with no anonymous identifier) may be retained longer for trend analysis.
+            </li>
             <li>
               <strong>Feedback form submissions:</strong> Retained for up to <strong>12 months</strong> from
               the date of submission, then deleted, unless an ongoing correspondence requires retention.
