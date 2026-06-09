@@ -51,6 +51,12 @@ app.use(
     crossOriginEmbedderPolicy: false,
     // Permissive opener policy so the GoFundMe link in a new tab works cleanly.
     crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    // Helmet's default 'no-referrer' strips the Referer header on every outbound
+    // request, which makes YouTube's embedded player fail with Error 153
+    // ("embedder identity missing referrer"). 'strict-origin-when-cross-origin'
+    // is the modern browser default — it sends just the origin to third parties
+    // (enough for YouTube to verify the embedder) while hiding the full URL path.
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }),
 );
 
