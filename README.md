@@ -29,7 +29,48 @@ Implemented in `server/index.mjs`.
 
 ### `GET /health`
 
-Health check. Returns `{ "status": "ok" }`.
+Lightweight health check. Always returns `200` if the Node process is up.
+Reports DB connectivity but does **not** fail the check on DB outages — see
+the [Database → Health check](#health-check) section.
+
+### `POST /e`
+
+First-party analytics event ingestion. Same-origin only. Honors **Global Privacy
+Control (`Sec-GPC: 1`)** and **Do Not Track (`DNT: 1`)** — when either is set,
+the server returns `204` immediately and writes nothing.
+
+**Request body:**
+```json
+{
+  "name": "donate_cta_click",
+  "page_path": "/",
+  "referrer": "https://example.com",
+  "props": { "location": "hero" },
+  "utm": { "source": "twitter", "medium": "social", "campaign": "bpan-awareness" }
+}
+```
+
+**Allow-listed event names** (server rejects anything else):
+
+`page_view`, `section_view`, `video_play`, `video_watched_25`, `video_watched_50`,
+`video_watched_75`, `video_watched_100`, `donate_cta_click`, `donate_outbound`,
+`feedback_submitted`, `share_click`, `external_click`.
+
+**Responses:**
+
+| Status | Meaning |
+|--------|---------|
+| `204 No Content` | Event accepted (or silently dropped under GPC/DNT) |
+| `400 Bad Request` | Invalid body, unknown event name, oversize props |
+| `429 Too Many Requests` | Rate-limited (60 events / minute per `anon_id`) |
+| `500 Internal Server Error` | DB or unexpected failure (logged) |
+
+**Cookie:** First-party `anon_id` (UUID v4) is set on the first non-opt-out
+request. `HttpOnly; Secure; SameSite=Lax; Max-Age=1y`. The frontend never reads
+it — it just rides along automatically on same-origin POSTs.
+
+See `server/ingest.mjs` for the full implementation and `src/app/utils/analytics.ts`
+for the frontend SDK that emits these events.
 
 ### `POST /feedback`
 
@@ -111,7 +152,22 @@ Two tables, defined in `server/migrations/001_init_analytics.sql`:
 | `sessions` | One row per visitor session (30-min inactivity window). Tracks entry/exit page, referrer, UTM params, derived UA family + device class, and a denormalized event count. |
 | `events` | One row per individual interaction (`page_view`, `donate_cta_click`, `video_play`, etc.). Carries a flexible `props JSONB` payload for event-specific data. Foreign-keyed to `sessions`. |
 
-All identifiers are random UUIDs assigned to a first-party cookie — no personally identifiable information is stored. See the Privacy Policy for details.
+All identifiers are random UUIDs assigned to a first-party cookie — no personally identifiable information is stored. No raw IPs or User-Agents are persisted. See the Privacy Policy for details.
+
+### Retention
+
+Raw event rows are purged after **90 days** (configurable via
+`ANALYTICS_RETENTION_DAYS`):
+
+```bash
+# Sweep events + orphan sessions older than the retention window
+pnpm run db:purge
+```
+
+Idempotent and safe to run on a daily schedule (Railway Cron Trigger). Sessions
+are deleted only when (a) their last activity is outside the retention window
+AND (b) they have no surviving events — belt-and-suspenders against fresh
+sessions that haven't yet logged their first event.
 
 ### Migrations
 
@@ -214,11 +270,19 @@ laneysworld/
 │   │   ├── components/
 │   │   ├── data/
 │   │   └── utils/
+│   │       └── analytics.ts  # trackEvent SDK — dual-writes to GA4 + POST /e,
+│   │                          # honors GPC/DNT, uses sendBeacon when available
 │   ├── assets/               # Optimized hero/photo images
 │   └── styles/
 ├── server/                   # Express backend
-│   ├── package.json          # express + cors (helmet hoisted from root)
-│   └── index.mjs             # /health, /feedback, helmet+CSP, static dist/
+│   ├── package.json          # express + cors + pg (helmet hoisted from root)
+│   ├── index.mjs             # /health, /e, /feedback, helmet+CSP, static dist/
+│   ├── db.mjs                # lazy pg.Pool, query(), dbHealthy(), SSL auto-detect
+│   ├── ingest.mjs            # POST /e — GPC/DNT honoring, sessionization, rate limit
+│   ├── migrate.mjs           # transactional migration runner
+│   ├── purge.mjs             # 90-day retention sweep
+│   └── migrations/
+│       └── 001_init_analytics.sql
 └── .github/
     └── workflows/
         └── frontend-ci.yml   # CI: pnpm install + vite build, sticky bot PR comments
@@ -303,6 +367,14 @@ Set `VITE_API_URL=http://localhost:3001` in `.env` to point the dev frontend at 
 ### June 8, 2026 — Perf + SEO + Security Hardening (PR #6)
 
 - **Change:** Added helmet + CSP, fixed asset cache headers, switched `robots` from `noindex` to `index,follow`, added OG/Twitter cards + JSON-LD structured data, code-split `FeedbackModal` and `PrivacyPolicy`, and re-encoded hero images (23 MB → 4 MB) via a new `scripts/optimize-images.mjs` pipeline.
+
+### June 9, 2026 — First-party Analytics Pipeline (PRs #10–#12)
+
+- **Change:** Stood up a first-party Postgres analytics pipeline alongside GA4.
+  - **PR #10:** Added `pg`, `server/db.mjs`, `sessions` + `events` schema, migration runner, `/health` DB ping.
+  - **PR #11:** `POST /e` ingest endpoint with `anon_id` cookie, GPC + DNT honoring (fully silent), token-bucket rate limit, allow-listed event names, 90-day retention via `pnpm run db:purge`. Privacy Policy updated.
+  - **PR #12:** Frontend `trackEvent`/`trackPageView` SDK dual-writes to GA4 and `POST /e` (via `sendBeacon`); wires `page_view`, `section_view`, `video_play`, donate clicks, share, feedback, and external-link events.
+- **GA4 status:** kept in parallel for ~1 week to validate; full removal scheduled as PR #13.
 
 ---
 

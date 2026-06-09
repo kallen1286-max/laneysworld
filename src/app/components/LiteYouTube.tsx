@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { trackEvent } from '../utils/analytics';
 
 interface LiteYouTubeProps {
   videoId: string;
@@ -36,7 +37,10 @@ export function LiteYouTube({ videoId, title, heightClass = 'h-[200px] sm:h-[240
     <button
       type="button"
       className={`relative w-full bg-black overflow-hidden cursor-pointer group rounded-xl sm:rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${heightClass}`}
-      onClick={() => setActivated(true)}
+      onClick={() => {
+        trackEvent('video_play', { video_id: videoId, video_title: title });
+        setActivated(true);
+      }}
       aria-label={`Play video: ${title}`}
     >
       {/* Thumbnail */}
