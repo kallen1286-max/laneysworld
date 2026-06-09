@@ -17,7 +17,7 @@ A charity website raising awareness and funding for BPAN (Beta-propeller Protein
 | **Email** | Resend API | Scoped API key, custom domain `laneysworld.com` |
 | **Hosting** | Railway | Auto-deploys from `main` via Railpack |
 | **DNS** | Porkbun | Nameservers: `*.ns.porkbun.com` |
-| **Analytics** | Google Analytics | GA4 ID: `G-BJL7K6S6PC` |
+| **Analytics** | Google Analytics + first-party Postgres event log | GA4 ID: `G-ZS831G1M89` |
 
 The site previously ran on Figma Sites + a Supabase edge function. As of June 2026, both have been removed in favor of a single repo containing the Vite frontend and a small Express backend that talks to Resend directly.
 
@@ -91,9 +91,48 @@ When adding new third-party scripts, frames, or fetch destinations, update the c
 | `RESEND_API_KEY` | Backend (Railway) | Scoped Resend key for `laneysworld.com` **only** (isolated from TradeEscape) |
 | `PORT` | Backend (Railway) | Defaults to `3001` locally; Railway sets this automatically |
 | `FEEDBACK_NOTIFICATION_TO` | Backend (Railway, optional) | Where notification emails are sent. Defaults to `kallen1286@gmail.com`. |
+| `DATABASE_URL` | Backend (Railway) | PostgreSQL connection string. Provisioned via the linked `Postgres` service. Used by the analytics event store. |
 | `VITE_API_URL` | Frontend (build time) | Base URL of the backend. Leave empty to call same-origin. |
 
 See `.env.example` for reference.
+
+---
+
+## Database (PostgreSQL)
+
+A Railway-managed Postgres instance backs the first-party analytics event store. The connection is wired into the Express service via Railway's variable references (`DATABASE_URL` references the `Postgres` service's internal URL — traffic stays on Railway's private network).
+
+### Schema
+
+Two tables, defined in `server/migrations/001_init_analytics.sql`:
+
+| Table | Purpose |
+|-------|---------|
+| `sessions` | One row per visitor session (30-min inactivity window). Tracks entry/exit page, referrer, UTM params, derived UA family + device class, and a denormalized event count. |
+| `events` | One row per individual interaction (`page_view`, `donate_cta_click`, `video_play`, etc.). Carries a flexible `props JSONB` payload for event-specific data. Foreign-keyed to `sessions`. |
+
+All identifiers are random UUIDs assigned to a first-party cookie — no personally identifiable information is stored. See the Privacy Policy for details.
+
+### Migrations
+
+```bash
+# Apply any pending migrations
+pnpm run db:migrate
+```
+
+The runner (`server/migrate.mjs`) reads every `.sql` file in `server/migrations/` in lexicographic order, applies each within a transaction, and records the version in `schema_migrations`. Already-applied migrations are skipped. Run it once from the Railway service shell after a new migration is added.
+
+### Health check
+
+`GET /health` reports DB connectivity:
+
+```json
+{ "status": "ok", "db": "ok" }              // happy path
+{ "status": "ok", "db": "unreachable" }     // DB hiccup; container stays alive
+{ "status": "ok", "db": "not_configured" }  // DATABASE_URL is unset
+```
+
+A DB outage does **not** fail the health check — Railway will not kill an otherwise-healthy container just because Postgres briefly hiccupped.
 
 ---
 

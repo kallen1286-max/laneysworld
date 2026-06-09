@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+import { dbHealthy, isDbConfigured } from './db.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // dist/ is produced by `vite build` at the repo root, one level above server/.
@@ -63,8 +64,15 @@ app.use(
 app.use(cors());
 app.use(express.json({ limit: '32kb' }));
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
+app.get('/health', async (_req, res) => {
+  // Lightweight liveness check. Always returns 200 if the Node process is up.
+  // DB connectivity is reported but does NOT fail the health check — we don't
+  // want Railway to kill an otherwise-healthy container just because Postgres
+  // briefly hiccupped. Use /health?db=required for a stricter check.
+  const db = isDbConfigured
+    ? (await dbHealthy()) ? 'ok' : 'unreachable'
+    : 'not_configured';
+  res.json({ status: 'ok', db });
 });
 
 app.post('/feedback', async (req, res) => {
