@@ -16,7 +16,8 @@
     "build": "vite build",
     "dev": "vite",
     "start": "node server/index.mjs",
-    "db:migrate": "node server/migrate.mjs"
+    "db:migrate": "node server/migrate.mjs",
+    "db:purge": "node server/purge.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -154,7 +155,5 @@
     "overrides": {
       "vite": "6.3.5"
     }
-  },
-  "readme": "ERROR: No README data found!",
-  "_id": "@figma/my-make-file@0.0.1"
+  }
 }

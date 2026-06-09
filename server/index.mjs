@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { dbHealthy, isDbConfigured } from './db.mjs';
+import { handleIngest } from './ingest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // dist/ is produced by `vite build` at the repo root, one level above server/.
@@ -74,6 +75,10 @@ app.get('/health', async (_req, res) => {
     : 'not_configured';
   res.json({ status: 'ok', db });
 });
+
+// First-party analytics ingest. See server/ingest.mjs for the privacy model
+// (GPC/DNT honored, anon_id cookie, 30-min session window, rate-limit, etc.)
+app.post('/e', handleIngest);
 
 app.post('/feedback', async (req, res) => {
   try {
@@ -195,7 +200,7 @@ if (fs.existsSync(distDir)) {
     }),
   );
   // SPA fallback: anything that isn't /health or /feedback gets index.html
-  app.get(/^\/(?!health$|feedback$).*/, (_req, res) => {
+  app.get(/^\/(?!health$|feedback$|e$).*/, (_req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(path.join(distDir, 'index.html'));
   });
