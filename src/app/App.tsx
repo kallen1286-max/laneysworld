@@ -869,26 +869,7 @@ export default function App() {
       <section aria-labelledby="main-content" className="relative w-full py-5 sm:py-8 lg:py-12 px-3 sm:px-4 lg:px-6">
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-            <div className="space-y-3 sm:space-y-4 order-2 lg:order-1">
-              {/* Laney's World Logo */}
-              <div className="flex justify-center lg:justify-start">
-                <button 
-                  onClick={scrollToTop}
-                  className="hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded-2xl"
-                  aria-label="Scroll to top"
-                >
-                  <img 
-                    src={laneysWorldLogo} 
-                    alt="Delaney's World - Anchored in Love & Joy - BPAN Awareness" 
-                    className="w-28 sm:w-32 lg:w-40 h-auto rounded-2xl"
-                    width={160}
-                    height={160}
-                    loading="eager"
-                    fetchpriority="high"
-                  />
-                </button>
-              </div>
-              
+            <div className="space-y-4 sm:space-y-5 order-2 lg:order-1">
               <h1 id="main-content" className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-gray-900 leading-tight text-center lg:text-left">
                 Meet Delaney. Fight BPAN. Give Hope.
               </h1>
@@ -1041,9 +1022,19 @@ export default function App() {
       <section id="delaneys-world" aria-labelledby="delaney-heading" className="w-full py-6 sm:py-8 lg:py-10 px-3 sm:px-4 lg:px-6 bg-gradient-to-r from-purple-50 to-pink-50">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-4 sm:mb-6">
-            <h2 id="delaney-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-3 sm:mb-4 px-1 flex items-center justify-center gap-2">
+            {/* Brand-mark lockup — paired with the "Anchored in Love & Joy" heading whose wordmark it carries */}
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <img
+                src={laneysWorldLogo}
+                alt="Delaney's World - Anchored in Love & Joy - BPAN Awareness"
+                className="w-36 sm:w-44 lg:w-52 h-auto rounded-2xl"
+                width={208}
+                height={208}
+                loading="lazy"
+              />
+            </div>
+            <h2 id="delaney-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-3 sm:mb-4 px-1">
               Delaney's World: Anchored in Love & Joy
-              <Heart className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-pink-500 fill-pink-500" />
             </h2>
           </div>
           
