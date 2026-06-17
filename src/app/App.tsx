@@ -20,6 +20,7 @@ import delaneyFamilyFarmImage from 'figma:asset/2d9cfc58c306febc731ea9f6c6f5ab4e
 import delaneyDadNewImage from 'figma:asset/2e11e1f5c3597beb16397a3aba515293c8ec6cb7.png';
 import delaneyIceCreamDadImage from 'figma:asset/843a35f5dd3cd234c6c26e5d455cdf8b8748171d.png';
 import laneysWorldLogo from 'figma:asset/098025f9056d201a154be344dcf4936569c25264.png';
+import brandMarkIcon from '../assets/brand-mark-icon.png';
 import { researchArticles, lastUpdated } from './data/research-articles';
 import { Link } from './components/ui/link';
 import { Toaster } from './components/ui/sonner';
@@ -865,10 +866,10 @@ export default function App() {
       
       <main className="w-full max-w-[100vw]">
       {/* Hero Section */}
-      <section aria-labelledby="main-content" className="relative w-full py-8 sm:py-12 lg:py-16 px-3 sm:px-4 lg:px-6">
+      <section aria-labelledby="main-content" className="relative w-full py-5 sm:py-8 lg:py-12 px-3 sm:px-4 lg:px-6">
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-            <div className="space-y-4 sm:space-y-6 order-2 lg:order-1">
+            <div className="space-y-3 sm:space-y-4 order-2 lg:order-1">
               {/* Laney's World Logo */}
               <div className="flex justify-center lg:justify-start">
                 <button 
@@ -879,9 +880,9 @@ export default function App() {
                   <img 
                     src={laneysWorldLogo} 
                     alt="Delaney's World - Anchored in Love & Joy - BPAN Awareness" 
-                    className="w-40 sm:w-48 lg:w-56 h-auto rounded-2xl"
-                    width={224}
-                    height={224}
+                    className="w-28 sm:w-32 lg:w-40 h-auto rounded-2xl"
+                    width={160}
+                    height={160}
                     loading="eager"
                     fetchpriority="high"
                   />
@@ -2094,14 +2095,14 @@ export default function App() {
       {/* Footer */}
       <footer className="w-full py-6 sm:py-7 pb-28 sm:pb-24 px-4 sm:px-4 lg:px-6 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto w-full text-center space-y-4 sm:space-y-5">
-          {/* Footer Logo */}
+          {/* Footer Logo — icon-only mark reads clearly at small sizes against dark bg */}
           <div className="flex justify-center">
             <img 
-              src={laneysWorldLogo} 
-              alt="Delaney's World - Anchored in Love & Joy" 
-              className="w-28 sm:w-32 h-auto rounded-2xl opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300"
-              width={128}
-              height={128}
+              src={brandMarkIcon} 
+              alt="Delaney's World" 
+              className="w-20 sm:w-24 h-auto opacity-95 hover:opacity-100 hover:scale-105 transition-all duration-300"
+              width={96}
+              height={96}
               loading="lazy"
             />
           </div>
