@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 560" width="600" height="560">
-  <rect width="600" height="560" fill="#F8FAFC"/>
   <g transform="translate(216.00, 60) scale(1.4)">
     <g>
       <line x1="6" y1="75" x2="114" y2="75" stroke="#E6A100" stroke-width="4" stroke-linecap="round"/>
@@ -7,21 +6,14 @@
       <line x1="29.09" y1="66.72" x2="9.77" y2="61.54" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="35.49" y1="54.43" x2="20.17" y2="41.58" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="46.48" y1="46.00" x2="38.02" y2="27.87" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="60.00" y1="43.00" x2="60.00" y2="23.00" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="73.52" y1="46.00" x2="81.98" y2="27.87" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="84.51" y1="54.43" x2="99.83" y2="41.58" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/><line x1="90.91" y1="66.72" x2="110.23" y2="61.54" stroke="#E6A100" stroke-width="5" stroke-linecap="round"/>
     </g>
   </g>
-  <text x="300.0" y="255.0"
-        text-anchor="middle"
-        font-family="Montserrat" font-weight="600" font-size="56"
-        fill="#0F172A" letter-spacing="14">LANEY'S</text>
-  <text x="300.0" y="325.0"
-        text-anchor="middle"
-        font-family="Montserrat" font-weight="600" font-size="56"
-        fill="#0F172A" letter-spacing="14">WORLD</text>
-  <text x="300.0" y="381.0"
-        text-anchor="middle"
-        font-family="Lora" font-weight="400" font-style="italic"
-        font-size="22" fill="#475569"
+  <text x="300.0" y="255.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
+        font-weight="600" font-size="56" fill="currentColor" letter-spacing="14">LANEY'S</text>
+  <text x="300.0" y="325.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
+        font-weight="600" font-size="56" fill="currentColor" letter-spacing="14">WORLD</text>
+  <text x="300.0" y="381.0" text-anchor="middle" font-family="Lora, Georgia, serif"
+        font-weight="400" font-style="italic" font-size="24" fill="currentColor" fill-opacity="0.72"
         letter-spacing="0.5">Horizon of hope for BPAN</text>
-  <text x="300.0" y="421.0"
-        text-anchor="middle"
-        font-family="Montserrat" font-weight="600" font-size="12"
-        fill="#475569" letter-spacing="5">BPAN AWARENESS</text>
+  <text x="300.0" y="421.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
+        font-weight="600" font-size="12" fill="currentColor" fill-opacity="0.6"
+        letter-spacing="5">BPAN AWARENESS</text>
 </svg>
