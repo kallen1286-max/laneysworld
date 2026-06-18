@@ -25,11 +25,11 @@ function Section({ id, icon, title, children }: SectionProps) {
         <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 text-blue-600">
           {icon}
         </div>
-        <h2 id={`${id}-heading`} className="text-xl sm:text-2xl text-gray-900">
+        <h2 id={`${id}-heading`} className="text-xl sm:text-2xl text-gray-900 dark:text-[#F8FAFC]">
           {title}
         </h2>
       </div>
-      <div className="text-sm sm:text-base text-gray-700 leading-relaxed space-y-3 pl-12">
+      <div className="text-sm sm:text-base text-gray-700 dark:text-[#CBD5E1] leading-relaxed space-y-3 pl-12">
         {children}
       </div>
     </section>
@@ -40,7 +40,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Top Nav */}
-      <nav aria-label="Privacy policy navigation" className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <nav aria-label="Privacy policy navigation" className="sticky top-0 z-40 bg-white dark:bg-[#0B1220] border-b border-gray-200 dark:border-[#1E293B] shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
           <button
             onClick={onBack}
@@ -50,8 +50,8 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to Home
           </button>
-          <div className="h-4 w-px bg-gray-300 flex-shrink-0" aria-hidden="true" />
-          <span className="text-sm text-gray-500 truncate">Privacy Policy & IP Notice</span>
+          <div className="h-4 w-px bg-gray-300 dark:bg-[#1E293B] flex-shrink-0" aria-hidden="true" />
+          <span className="text-sm text-gray-500 dark:text-[#94A3B8] truncate">Privacy Policy & IP Notice</span>
         </div>
       </nav>
 
@@ -72,10 +72,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               loading="eager"
             />
           </button>
-          <h1 className="text-3xl sm:text-4xl text-gray-900 mb-3">
+          <h1 className="text-3xl sm:text-4xl text-gray-900 dark:text-[#F8FAFC] mb-3">
             Privacy Policy & Intellectual Property Notice
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-[#94A3B8] text-sm">
             {SITE_NAME} · {ORG_NAME} · Effective {EFFECTIVE_DATE}
           </p>
           <div className="mt-4 inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm px-4 py-2 rounded-full">
@@ -85,8 +85,8 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         </header>
 
         {/* Quick-jump nav */}
-        <nav aria-label="Jump to section" className="bg-white border border-gray-200 rounded-xl p-5 mb-10">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Contents</p>
+        <nav aria-label="Jump to section" className="bg-white dark:bg-[#0B1220] border border-gray-200 dark:border-[#1E293B] rounded-xl p-5 mb-10">
+          <p className="text-xs font-semibold text-gray-500 dark:text-[#94A3B8] uppercase tracking-wide mb-3">Contents</p>
           <ol className="grid sm:grid-cols-2 gap-1.5 text-sm text-blue-600">
             {[
               ['#info-collected', '1. Information We Collect'],
@@ -114,7 +114,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         </nav>
 
         {/* Introduction */}
-        <div className="bg-blue-50 rounded-xl p-5 mb-10 text-sm sm:text-base text-gray-700 leading-relaxed">
+        <div className="bg-blue-50 dark:bg-[#0F172A] rounded-xl p-5 mb-10 text-sm sm:text-base text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
           <p>
             {SITE_NAME} is operated by the <strong>{ORG_NAME}</strong>, a 501(c)(3) nonprofit organization
             (Tax ID {TAX_ID}) based in Fairfield, Connecticut. This page explains what personal information
@@ -214,9 +214,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 link: 'https://resend.com/privacy',
               },
             ].map(svc => (
-              <div key={svc.name} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <p className="font-semibold text-gray-900">{svc.name}</p>
-                <p className="text-sm text-gray-600 mt-0.5">{svc.use}</p>
+              <div key={svc.name} className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-3 border border-gray-200 dark:border-[#1E293B]">
+                <p className="font-semibold text-gray-900 dark:text-[#F8FAFC]">{svc.name}</p>
+                <p className="text-sm text-gray-600 dark:text-[#CBD5E1] mt-0.5">{svc.use}</p>
                 <div className="flex flex-wrap gap-3 mt-1.5 text-sm">
                   <a
                     href={svc.link}
@@ -250,9 +250,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="text-left px-3 py-2 rounded-tl-lg font-semibold text-gray-900">Cookie</th>
-                  <th className="text-left px-3 py-2 font-semibold text-gray-900">Purpose</th>
-                  <th className="text-left px-3 py-2 rounded-tr-lg font-semibold text-gray-900">Duration</th>
+                  <th className="text-left px-3 py-2 rounded-tl-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">Cookie</th>
+                  <th className="text-left px-3 py-2 font-semibold text-gray-900 dark:text-[#F8FAFC]">Purpose</th>
+                  <th className="text-left px-3 py-2 rounded-tr-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">Duration</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -262,10 +262,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                   { name: '_ga_XXXXXXXX', purpose: 'Google Analytics — session state for GA4', duration: '2 years' },
                   { name: 'YouTube cookies', purpose: 'Set only when you click the video play button', duration: 'Session / up to 180 days' },
                 ].map(row => (
-                  <tr key={row.name} className="bg-white">
-                    <td className="px-3 py-2 font-mono text-xs text-gray-700">{row.name}</td>
-                    <td className="px-3 py-2 text-gray-700">{row.purpose}</td>
-                    <td className="px-3 py-2 text-gray-500">{row.duration}</td>
+                  <tr key={row.name} className="bg-white dark:bg-[#0B1220]">
+                    <td className="px-3 py-2 font-mono text-xs text-gray-700 dark:text-[#CBD5E1]">{row.name}</td>
+                    <td className="px-3 py-2 text-gray-700 dark:text-[#CBD5E1]">{row.purpose}</td>
+                    <td className="px-3 py-2 text-gray-500 dark:text-[#94A3B8]">{row.duration}</td>
                   </tr>
                 ))}
               </tbody>
@@ -301,7 +301,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 <p className="font-semibold text-blue-900 text-sm mb-2">{block.law}</p>
                 <ul className="space-y-1">
                   {block.rights.map(r => (
-                    <li key={r} className="text-xs text-gray-700 flex items-start gap-1.5">
+                    <li key={r} className="text-xs text-gray-700 dark:text-[#CBD5E1] flex items-start gap-1.5">
                       <span className="text-blue-400 mt-0.5 flex-shrink-0">✓</span>
                       {r}
                     </li>
@@ -441,9 +441,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         {/* ── Section 11 ── */}
         <Section id="contact" icon={<Mail className="h-5 w-5" />} title="11. Contact Us">
           <p>For any privacy request, data deletion, IP inquiry, or question about this policy:</p>
-          <div className="bg-blue-50 rounded-xl p-4 mt-2 inline-block">
-            <p className="font-semibold text-gray-900">{SITE_NAME} / {ORG_NAME}</p>
-            <p className="text-gray-600">Fairfield, Connecticut, USA</p>
+          <div className="bg-blue-50 dark:bg-[#0F172A] rounded-xl p-4 mt-2 inline-block">
+            <p className="font-semibold text-gray-900 dark:text-[#F8FAFC]">{SITE_NAME} / {ORG_NAME}</p>
+            <p className="text-gray-600 dark:text-[#CBD5E1]">Fairfield, Connecticut, USA</p>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="text-blue-600 hover:text-blue-800 font-medium hover:underline mt-1 inline-block"
@@ -451,14 +451,14 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               {CONTACT_EMAIL}
             </a>
           </div>
-          <p className="mt-4 text-gray-500 text-xs">
+          <p className="mt-4 text-gray-500 dark:text-[#94A3B8] text-xs">
             We will respond to all privacy requests within 30 days. For GDPR-covered requests we will
             respond within 45 days and may ask you to verify your identity before acting on the request.
           </p>
         </Section>
 
         {/* Back to home */}
-        <div className="text-center mt-12 pt-8 border-t border-gray-200">
+        <div className="text-center mt-12 pt-8 border-t border-gray-200 dark:border-[#1E293B]">
           <button
             onClick={onBack}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -466,7 +466,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <Heart className="h-4 w-4" aria-hidden="true" />
             Back to Delaney's World
           </button>
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="text-xs text-gray-400 dark:text-[#64748B] mt-4">
             © {new Date().getFullYear()} {ORG_NAME} · Tax ID {TAX_ID} · All rights reserved.
           </p>
         </div>

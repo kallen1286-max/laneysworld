@@ -140,11 +140,11 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
       aria-labelledby="feedback-modal-title"
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-white dark:bg-[#0B1220] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-5 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#0F172A] dark:to-[#E6A100] px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <MessageSquare className="h-5 w-5 text-white flex-shrink-0" aria-hidden="true" />
             <h2
@@ -174,17 +174,17 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                 className="h-14 w-14 text-green-500 mx-auto mb-4"
                 aria-hidden="true"
               />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-[#F8FAFC] mb-2">
                 Thank you!
               </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
+              <p className="text-gray-500 dark:text-[#94A3B8] text-sm leading-relaxed">
                 Your message is on its way. We'll be in touch soon.
               </p>
             </div>
           ) : (
             /* ── Form State ── */
             <form onSubmit={handleSubmit} noValidate>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+              <p className="text-sm text-gray-500 dark:text-[#94A3B8] mb-5 leading-relaxed">
                 Questions, thoughts, or just want to say hi? We'd love to hear from you.
               </p>
 
@@ -193,10 +193,10 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                 <div>
                   <label
                     htmlFor="feedback-name"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-gray-700 dark:text-[#CBD5E1] mb-1.5"
                   >
                     Name{' '}
-                    <span className="text-gray-400 font-normal text-xs">(optional)</span>
+                    <span className="text-gray-400 dark:text-[#64748B] font-normal text-xs">(optional)</span>
                   </label>
                   <input
                     ref={firstInputRef}
@@ -207,7 +207,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                     placeholder="Your name"
                     autoComplete="name"
                     disabled={isSubmitting}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-[#1E293B] rounded-lg text-sm text-gray-900 dark:text-[#F8FAFC] placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0F172A]"
                   />
                 </div>
 
@@ -215,7 +215,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                 <div>
                   <label
                     htmlFor="feedback-email"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-gray-700 dark:text-[#CBD5E1] mb-1.5"
                   >
                     Email{' '}
                     <span className="text-red-500 text-xs" aria-label="required">*</span>
@@ -229,7 +229,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                     autoComplete="email"
                     aria-required="true"
                     disabled={isSubmitting}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-[#1E293B] rounded-lg text-sm text-gray-900 dark:text-[#F8FAFC] placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0F172A]"
                   />
                 </div>
 
@@ -237,7 +237,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                 <div>
                   <label
                     htmlFor="feedback-message"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-gray-700 dark:text-[#CBD5E1] mb-1.5"
                   >
                     Message{' '}
                     <span className="text-red-500 text-xs" aria-label="required">*</span>
@@ -250,7 +250,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                     rows={5}
                     aria-required="true"
                     disabled={isSubmitting}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none disabled:opacity-50 disabled:bg-gray-50"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-[#1E293B] rounded-lg text-sm text-gray-900 dark:text-[#F8FAFC] placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0F172A]"
                   />
                 </div>
               </div>
@@ -274,7 +274,7 @@ export function FeedbackModal({ isOpen, onClose, openedFrom = 'unknown' }: Feedb
                 )}
               </button>
 
-              <p className="text-xs text-gray-400 text-center mt-4 leading-relaxed">
+              <p className="text-xs text-gray-400 dark:text-[#64748B] text-center mt-4 leading-relaxed">
                 Sent directly to the team. We respect your privacy.
               </p>
             </form>

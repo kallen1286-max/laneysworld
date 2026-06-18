@@ -4,7 +4,7 @@ export function AnimatedPoem() {
   return (
     <div className="space-y-6 font-serif">
       <motion.p 
-        className="text-xl sm:text-2xl text-gray-800 leading-relaxed italic" 
+        className="text-xl sm:text-2xl text-gray-800 dark:text-[#F8FAFC] leading-relaxed italic" 
         style={{ lineHeight: '1.8' }}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -20,7 +20,7 @@ export function AnimatedPoem() {
       </motion.p>
       
       <motion.p 
-        className="text-xl sm:text-2xl text-gray-800 leading-relaxed italic" 
+        className="text-xl sm:text-2xl text-gray-800 dark:text-[#F8FAFC] leading-relaxed italic" 
         style={{ lineHeight: '1.8' }}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -36,7 +36,7 @@ export function AnimatedPoem() {
       </motion.p>
       
       <motion.p 
-        className="text-xl sm:text-2xl text-gray-800 leading-relaxed italic" 
+        className="text-xl sm:text-2xl text-gray-800 dark:text-[#F8FAFC] leading-relaxed italic" 
         style={{ lineHeight: '1.8' }}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export function AnimatedPoem() {
       </motion.p>
       
       <motion.p 
-        className="text-xl sm:text-2xl text-gray-800 leading-relaxed italic" 
+        className="text-xl sm:text-2xl text-gray-800 dark:text-[#F8FAFC] leading-relaxed italic" 
         style={{ lineHeight: '1.8' }}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
