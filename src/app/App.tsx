@@ -21,8 +21,10 @@ import delaneyDadNewImage from 'figma:asset/2e11e1f5c3597beb16397a3aba515293c8ec
 import delaneyIceCreamDadImage from 'figma:asset/843a35f5dd3cd234c6c26e5d455cdf8b8748171d.png';
 // Brand assets — Horizon Wordmark (June 2026 redesign)
 // SVG sources live in src/assets/brand/. Public PNG fallbacks live in /brand/ for meta tags and crawlers.
-import laneysWorldLogo from '../assets/brand/horizontal-light.svg';
-import laneysWorldStacked from '../assets/brand/stacked-light.svg';
+import horizontalLightSvg from '../assets/brand/horizontal-light.svg';
+import horizontalDarkSvg from '../assets/brand/horizontal-dark.svg';
+import stackedLightSvg from '../assets/brand/stacked-light.svg';
+import stackedDarkSvg from '../assets/brand/stacked-dark.svg';
 import brandMarkIcon from '../assets/brand/icon-transparent.svg';
 import { researchArticles, lastUpdated } from './data/research-articles';
 import { Link } from './components/ui/link';
@@ -81,6 +83,28 @@ export default function App() {
   const stickyHeaderRef = useRef<HTMLElement>(null);
   // Ref for transcript modal inner container — used for focus trap (SC 2.1.2 fix)
   const transcriptModalRef = useRef<HTMLDivElement>(null);
+
+  // Track the active theme so logo <img> sources can swap to dark variants.
+  // The `.dark` class is owned by the anti-FOUC script + main.tsx OS listener;
+  // we observe it here rather than re-deriving theme from matchMedia.
+  const [isDark, setIsDark] = useState(
+    () =>
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark'),
+  );
+  useEffect(() => {
+    const obs = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    return () => obs.disconnect();
+  }, []);
+
+  const logoHorizontal = isDark ? horizontalDarkSvg : horizontalLightSvg;
+  const logoStacked = isDark ? stackedDarkSvg : stackedLightSvg;
 
   // ── Lightweight client-side router ──────────────────────────────────────
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
@@ -760,10 +784,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-blue-50 to-white dark:from-[#0B1220] dark:to-[#0B1220]">
       {/* Loading Screen */}
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-[#0B1220]">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -771,7 +795,7 @@ export default function App() {
             className="flex flex-col items-center gap-4"
           >
             <img 
-              src={laneysWorldStacked} 
+              src={logoStacked}
               alt="Delaney's World \u2014 Horizon of hope for BPAN" 
               className="w-56 h-auto"
             />
@@ -800,7 +824,7 @@ export default function App() {
         initial={{ y: -120 }}
         animate={{ y: showStickyHeader ? 0 : -120 }}
         transition={{ duration: 0.3 }}
-        className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200"
+        className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#0B1220] border-b border-gray-200 dark:border-[#1E293B]"
       >
         <nav aria-label="Sticky site navigation">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -810,7 +834,7 @@ export default function App() {
             aria-label="Scroll to top"
           >
             <img 
-              src={laneysWorldLogo} 
+              src={logoHorizontal}
               alt="Delaney's World \u2014 Horizon of hope for BPAN" 
               className="h-10 sm:h-12 w-auto"
               height={48}
@@ -828,7 +852,7 @@ export default function App() {
                   button_location: 'sticky_header',
                 });
               }}
-              className="inline-flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              className="inline-flex items-center gap-1.5 text-gray-600 dark:text-[#CBD5E1] hover:text-blue-600 transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
               aria-label="Send us a message"
             >
               <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
@@ -872,10 +896,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
             <div className="space-y-4 sm:space-y-5 order-2 lg:order-1">
-              <h1 id="main-content" className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-gray-900 leading-tight text-center lg:text-left">
+              <h1 id="main-content" className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-gray-900 dark:text-[#F8FAFC] leading-tight text-center lg:text-left">
                 Meet Delaney. Fight BPAN. Give Hope.
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed text-center lg:text-left">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-[#CBD5E1] leading-relaxed text-center lg:text-left">
                 Delaney is just one of an estimated 500 children worldwide with BPAN – a rare neurodegenerative disorder. 
                 Her joy is contagious. Her fight deserves action. Join us to raise awareness, fund gene therapy research, and change lives.
               </p>
@@ -920,22 +944,22 @@ export default function App() {
       </section>
 
       {/* What Is BPAN Section */}
-      <section id="what-is-bpan" aria-labelledby="bpan-heading" className="w-full py-8 sm:py-12 lg:py-16 px-3 sm:px-4 lg:px-6 bg-white">
+      <section id="what-is-bpan" aria-labelledby="bpan-heading" className="w-full py-8 sm:py-12 lg:py-16 px-3 sm:px-4 lg:px-6 bg-white dark:bg-[#0B1220]">
         <div className="max-w-4xl mx-auto w-full">
           <div className="text-center mb-6 sm:mb-10">
-            <h2 id="bpan-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-3 sm:mb-4 px-1">
+            <h2 id="bpan-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 dark:text-[#F8FAFC] mb-3 sm:mb-4 px-1">
               What Is BPAN? And Why Haven't You Heard of It?
             </h2>
           </div>
           
           <div className="grid md:grid-cols-2 gap-6 sm:gap-10 items-center">
             <div className="space-y-3 sm:space-y-5">
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-[#CBD5E1] leading-relaxed">
                 BPAN (Beta-propeller Protein-Associated Neurodegeneration) is caused by a spontaneous 
                 mutation in the WDR45 gene. It leads to iron buildup in the brain, causing seizures, 
                 developmental delays, and progressive neurodegeneration.
               </p>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-[#CBD5E1] leading-relaxed">
                 Only about 500 children worldwide are affected by BPAN. With awareness low and funding even scarcer, every voice matters – which is why this page exists.
               </p>
             </div>
@@ -983,7 +1007,7 @@ export default function App() {
                 href="https://www.ncbi.nlm.nih.gov/books/NBK424403/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 sm:gap-4 bg-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-full hover:bg-purple-700 transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 min-h-[56px]"
+                className="flex items-center gap-3 sm:gap-4 bg-brand-accent text-white px-4 sm:px-6 py-3 sm:py-4 rounded-full hover:bg-brand-accent-hover transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-accent)] focus:ring-offset-2 min-h-[56px]"
                 aria-label="Read BPAN clinical summary at NCBI GeneReviews (opens in new window)"
                 onClick={() => trackEvent('medical_resource_click', {
                   event_category: 'external_resource',
@@ -1005,13 +1029,13 @@ export default function App() {
       <section id="science" aria-labelledby="science-heading" className="w-full py-6 sm:py-8 lg:py-12 px-3 sm:px-4 lg:px-6 bg-gradient-to-b from-blue-50/30 to-white">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-4 sm:mb-6">
-            <h2 id="science-heading" className="text-2xl sm:text-3xl lg:text-4xl text-gray-900 mb-2 sm:mb-3 px-1">
+            <h2 id="science-heading" className="text-2xl sm:text-3xl lg:text-4xl text-gray-900 dark:text-[#F8FAFC] mb-2 sm:mb-3 px-1">
               Understanding the Science Behind BPAN
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-[#CBD5E1] max-w-2xl mx-auto px-2">
               How a single gene mutation triggers a cascade leading to BPAN
             </p>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 dark:text-[#94A3B8] mt-2">
               Click any card to learn more from official medical sources
             </p>
           </div>
@@ -1021,13 +1045,13 @@ export default function App() {
       </section>
 
       {/* Delaney's Story Section */}
-      <section id="delaneys-world" aria-labelledby="delaney-heading" className="w-full py-6 sm:py-8 lg:py-10 px-3 sm:px-4 lg:px-6 bg-gradient-to-r from-purple-50 to-pink-50">
+      <section id="delaneys-world" aria-labelledby="delaney-heading" className="w-full py-6 sm:py-8 lg:py-10 px-3 sm:px-4 lg:px-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-[#0F172A] dark:to-[#0B1220]">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-4 sm:mb-6">
             {/* Brand-mark lockup — paired with the "Anchored in Love & Joy" heading whose wordmark it carries */}
             <div className="flex justify-center mb-3 sm:mb-4">
               <img
-                src={laneysWorldStacked}
+                src={logoStacked}
                 alt="Delaney's World \u2014 Horizon of hope for BPAN"
                 className="w-48 sm:w-56 lg:w-64 h-auto"
                 width={256}
@@ -1035,18 +1059,18 @@ export default function App() {
                 loading="lazy"
               />
             </div>
-            <h2 id="delaney-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-3 sm:mb-4 px-1">
+            <h2 id="delaney-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 dark:text-[#F8FAFC] mb-3 sm:mb-4 px-1">
               Delaney's World: Anchored in Love & Joy
             </h2>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-4 lg:gap-6 items-start">
             <div className="space-y-2 sm:space-y-3 order-2 lg:order-1">
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-[#CBD5E1] leading-relaxed">
                 Delaney is {delaneyAge}. She's full of laughter, empathy, and quiet strength. She faces enormous 
                 challenges – yet lights up every room with her spirit.
               </p>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-[#CBD5E1] leading-relaxed">
                 She's part of a vibrant community supported by <em><a href="https://www.dontforgetmorgan.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" aria-label="Don't Forget Morgan (opens in new window)" onClick={() => trackEvent('partner_link_click', {
                   event_category: 'external_navigation',
                   event_label: 'dont_forget_morgan',
@@ -1058,7 +1082,7 @@ export default function App() {
               
               {/* Laney's Favorite Things - Title */}
               <div className="text-left pt-1">
-                <p className="text-xs sm:text-sm text-purple-600">Laney's Favorite Things</p>
+                <p className="text-xs sm:text-sm text-brand-accent">Laney's Favorite Things</p>
               </div>
               
               {/* Grid of family moments with aligned icons */}
@@ -1115,7 +1139,7 @@ export default function App() {
                       <circle cx="40" cy="12" r="3.5" fill="#DC143C" />
                       <path d="M 40 12 Q 42 6 44 4" stroke="#8B4513" strokeWidth="1.2" fill="none" />
                     </svg>
-                    <p className="text-xs text-center text-purple-600 mt-0.5">Ice Cream</p>
+                    <p className="text-xs text-center text-brand-accent mt-0.5">Ice Cream</p>
                   </div>
                 </div>
                 
@@ -1208,7 +1232,7 @@ export default function App() {
                         </radialGradient>
                       </defs>
                     </svg>
-                    <p className="text-xs text-center text-purple-600 mt-0.5">Music</p>
+                    <p className="text-xs text-center text-brand-accent mt-0.5">Music</p>
                   </div>
                 </div>
                 
@@ -1306,7 +1330,7 @@ export default function App() {
                         </radialGradient>
                       </defs>
                     </svg>
-                    <p className="text-xs text-center text-purple-600 mt-0.5">Meatballs</p>
+                    <p className="text-xs text-center text-brand-accent mt-0.5">Meatballs</p>
                   </div>
                 </div>
               </div>
@@ -1321,7 +1345,7 @@ export default function App() {
                     heightClass="h-[200px] sm:h-[240px] lg:h-[280px]"
                   />
                 {/* Video accessibility notice */}
-                <p className="text-xs sm:text-sm text-gray-600 mt-2 text-center">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-[#CBD5E1] mt-2 text-center">
                   Captions available. <button 
                     onClick={() => {
                       setShowTranscript(true);
@@ -1347,17 +1371,17 @@ export default function App() {
           {/* Poem from Delaney's Grandfather */}
           <div className="mt-6 sm:mt-8 lg:mt-10">
             {/* Option C: Pull-Quote Magazine Style */}
-            <div className="relative pl-8 sm:pl-12 pr-4 sm:pr-8 py-10 bg-gradient-to-r from-purple-50 to-transparent">
+            <div className="relative pl-8 sm:pl-12 pr-4 sm:pr-8 py-10 bg-gradient-to-r from-[#FFF8E5] to-transparent dark:from-[#1E293B] dark:to-transparent">
               {/* Large left accent border */}
-              <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-purple-600 via-pink-600 to-purple-600"></div>
-              
+              <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-[color:var(--brand-accent)] via-[color:var(--brand-accent-hover)] to-[color:var(--brand-accent)]"></div>
+
               {/* Opening quote mark - large and decorative */}
-              <div className="text-purple-500 text-7xl sm:text-8xl leading-none mb-6 font-serif opacity-30 absolute -top-4 left-8">
+              <div className="text-[color:var(--brand-accent)] text-7xl sm:text-8xl leading-none mb-6 font-serif opacity-30 absolute -top-4 left-8">
                 "
               </div>
               
               <div className="relative z-10 pt-8">
-                <h3 className="text-2xl sm:text-3xl text-gray-900 mb-8 font-serif italic text-center sm:text-left">
+                <h3 className="text-2xl sm:text-3xl text-gray-900 dark:text-[#F8FAFC] mb-8 font-serif italic text-center sm:text-left">
                   Delaney's World
                 </h3>
                 
@@ -1365,10 +1389,10 @@ export default function App() {
                 
                 {/* Closing quote and attribution */}
                 <div className="mt-8 flex items-end justify-between">
-                  <div className="text-purple-500 text-7xl leading-none font-serif opacity-30">"</div>
+                  <div className="text-[color:var(--brand-accent)] text-7xl leading-none font-serif opacity-30">"</div>
                   <div className="text-right">
-                    <div className="w-24 h-px bg-purple-400 ml-auto mb-2"></div>
-                    <p className="text-base sm:text-lg text-gray-600 font-serif italic">
+                    <div className="w-24 h-px bg-[color:var(--brand-border)] ml-auto mb-2"></div>
+                    <p className="text-base sm:text-lg text-gray-600 dark:text-[#CBD5E1] font-serif italic">
                       <cite>Colin, Delaney's Grandfather</cite>
                     </p>
                   </div>
@@ -1380,13 +1404,13 @@ export default function App() {
       </section>
 
       {/* Moments from Delaney's World - Photo Gallery */}
-      <section id="moments" aria-labelledby="moments-heading" className="w-full py-6 sm:py-8 lg:py-12 px-3 sm:px-4 lg:px-6 bg-gradient-to-b from-white to-purple-50">
+      <section id="moments" aria-labelledby="moments-heading" className="w-full py-6 sm:py-8 lg:py-12 px-3 sm:px-4 lg:px-6 bg-gradient-to-b from-white to-purple-50 dark:from-[#0B1220] dark:to-[#0F172A]">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-4 sm:mb-6">
-            <h2 id="moments-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-2 px-1">
+            <h2 id="moments-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 dark:text-[#F8FAFC] mb-2 px-1">
               Moments from Delaney's World
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-[#CBD5E1]">
               A celebration of joy, love, and the beauty of every day
             </p>
           </div>
@@ -1475,13 +1499,13 @@ export default function App() {
       </section>
 
       {/* Gene Therapy News Section */}
-      <section id="research" aria-labelledby="research-heading" className="w-full py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6 bg-white scroll-mt-16 sm:scroll-mt-20 lg:scroll-mt-24">
+      <section id="research" aria-labelledby="research-heading" className="w-full py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6 bg-white dark:bg-[#0B1220] scroll-mt-16 sm:scroll-mt-20 lg:scroll-mt-24">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-6 sm:mb-8">
-            <h2 id="research-heading" className="text-2xl sm:text-3xl lg:text-4xl text-gray-900 px-1">
+            <h2 id="research-heading" className="text-2xl sm:text-3xl lg:text-4xl text-gray-900 dark:text-[#F8FAFC] px-1">
               Recent Breakthroughs in Gene Therapy Research
             </h2>
-            <p className="text-base sm:text-lg text-gray-600 mt-2">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-[#CBD5E1] mt-2">
               Exciting progress in BPAN research. <a 
                 href={DONATION_URL}
                 target="_blank"
@@ -1497,7 +1521,7 @@ export default function App() {
               </a>.
             </p>
             {/* Last Updated Indicator */}
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-gray-400 dark:text-[#64748B] mt-2">
               Last updated: {lastUpdated}
             </p>
           </div>
@@ -1530,12 +1554,12 @@ export default function App() {
                               <BookOpen className="h-4 w-4 text-blue-600" aria-hidden="true" />
                               <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Essential Resource</span>
                             </div>
-                            <span className="text-sm text-gray-700">{article.sourceText}</span>
+                            <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
                           </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors mb-2">
                             {article.title}
                           </h3>
-                          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                          <p className="text-sm sm:text-base text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
                             {article.description}
                           </p>
                         </div>
@@ -1571,9 +1595,9 @@ export default function App() {
                         <div className="flex-1">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <Star className="h-3.5 w-3.5 text-blue-600" aria-hidden="true" />
-                            <span className="text-sm text-gray-700">{article.sourceText}</span>
+                            <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
                           </div>
-                          <h3 className="text-lg sm:text-xl text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <h3 className="text-lg sm:text-xl text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors">
                             {article.title}
                           </h3>
                         </div>
@@ -1608,9 +1632,9 @@ export default function App() {
                   <Card className="p-3 border border-gray-200 hover:border-gray-400 transition-all cursor-pointer h-full">
                     <CardContent className="p-0 flex flex-col h-full">
                       <div className="mb-1.5">
-                        <span className="text-sm text-gray-700">{article.sourceText}</span>
+                        <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
                       </div>
-                      <h4 className="text-base sm:text-lg text-gray-900 group-hover:text-blue-600 transition-colors leading-snug flex-1">
+                      <h4 className="text-base sm:text-lg text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors leading-snug flex-1">
                         {article.title}
                       </h4>
                     </CardContent>
@@ -1627,11 +1651,11 @@ export default function App() {
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center justify-center gap-2 mb-3">
               <Hospital className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" aria-hidden="true" />
-              <h2 id="centers-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900">
+              <h2 id="centers-heading" className="text-xl sm:text-2xl lg:text-3xl text-gray-900 dark:text-[#F8FAFC]">
                 Find Expert Care
               </h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto px-2">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-[#CBD5E1] max-w-3xl mx-auto px-2">
               U.S. Centers of Excellence vetted by the NBIA Disorders Association for specialized multidisciplinary expertise
             </p>
           </div>
@@ -1659,26 +1683,26 @@ export default function App() {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5 space-y-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
                     Longest-standing NBIA research hub globally. Primary contact for PKAN clinical trials and natural history studies.
                   </p>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Key Experts</h4>
-                    <p className="text-sm text-gray-700">Dr. Susan Hayflick, Dr. Penny Hogarth</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Key Experts</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Dr. Susan Hayflick, Dr. Penny Hogarth</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Coordinator</h4>
-                    <p className="text-sm text-gray-700">Allison Gregory, MS, CGC</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Coordinator</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Allison Gregory, MS, CGC</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Contact</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Contact</h4>
                     <div className="space-y-2">
                       <a 
                         href="tel:503-494-7703"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-blue-600 transition-colors p-3 rounded-lg hover:bg-blue-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-blue-600 transition-colors p-3 rounded-lg hover:bg-blue-50 -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'ohsu_phone',
@@ -1691,7 +1715,7 @@ export default function App() {
                       </a>
                       <a 
                         href="mailto:info@nbiacure.org"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-blue-600 transition-colors p-3 rounded-lg hover:bg-blue-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-blue-600 transition-colors p-3 rounded-lg hover:bg-blue-50 -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'ohsu_email',
@@ -1706,7 +1730,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Resources</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Resources</h4>
                     <div className="space-y-2">
                       <a 
                         href="https://nbiacure.org"
@@ -1769,26 +1793,26 @@ export default function App() {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5 space-y-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
                     <strong className="text-green-700">Global leader for BPAN care.</strong> Dedicated multidisciplinary BPAN clinic integrating neurology, genetics, and therapies.
                   </p>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Key Experts</h4>
-                    <p className="text-sm text-gray-700">Dr. Laura Adang, Dr. Joseph Vithayathil</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Key Experts</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Dr. Laura Adang, Dr. Joseph Vithayathil</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Coordinator</h4>
-                    <p className="text-sm text-gray-700">Victoria Lawler</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Coordinator</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Victoria Lawler</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Contact</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Contact</h4>
                     <div className="space-y-2">
                       <a 
                         href="tel:267-426-0716"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-green-600 transition-colors p-3 rounded-lg hover:bg-green-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-green-600 transition-colors p-3 rounded-lg hover:bg-green-50 -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'chop_phone',
@@ -1801,7 +1825,7 @@ export default function App() {
                       </a>
                       <a 
                         href="mailto:bpan@chop.edu"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-green-600 transition-colors p-3 rounded-lg hover:bg-green-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-green-600 transition-colors p-3 rounded-lg hover:bg-green-50 -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'chop_email',
@@ -1816,7 +1840,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Resources</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Resources</h4>
                     <div className="space-y-2">
                       <a 
                         href="https://www.chop.edu/centers-programs/clinic-bpan-and-wdr45-related-disorders"
@@ -1862,26 +1886,26 @@ export default function App() {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5 space-y-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
                     Major center for pediatric movement disorders and complex NBIA cases, including undiagnosed presentations.
                   </p>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Key Experts</h4>
-                    <p className="text-sm text-gray-700">Dr. Mariam Hull, Dr. Monica Emrick</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Key Experts</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Dr. Mariam Hull, Dr. Monica Emrick</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Clinic</h4>
-                    <p className="text-sm text-gray-700">Blue Bird Circle Clinic</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Clinic</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Blue Bird Circle Clinic</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Contact</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Contact</h4>
                     <div className="space-y-2">
                       <a 
                         href="tel:832-822-1750"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-orange-600 transition-colors p-3 rounded-lg hover:bg-orange-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-orange-600 transition-colors p-3 rounded-lg hover:bg-orange-50 -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'texas_childrens_phone',
@@ -1896,7 +1920,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Resources</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Resources</h4>
                     <div className="space-y-2">
                       <a 
                         href="https://www.texaschildrens.org/departments/neurology"
@@ -1938,7 +1962,7 @@ export default function App() {
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 {/* Header */}
-                <div className="bg-purple-600 text-white p-4 sm:p-5 min-h-[140px] sm:min-h-[160px] flex flex-col">
+                <div className="bg-brand-accent text-white p-4 sm:p-5 min-h-[140px] sm:min-h-[160px] flex flex-col">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Hospital className="h-6 w-6 text-white" aria-hidden="true" />
@@ -1948,7 +1972,7 @@ export default function App() {
                   <h3 className="text-base sm:text-lg leading-tight min-h-[44px] flex items-center">
                     UC Davis MIND Institute
                   </h3>
-                  <div className="flex items-center gap-1.5 text-sm mt-auto text-purple-100">
+                  <div className="flex items-center gap-1.5 text-sm mt-auto text-[#CBD5E1]">
                     <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                     <span>Sacramento, CA</span>
                   </div>
@@ -1956,26 +1980,26 @@ export default function App() {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5 space-y-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
                     Newest center focusing on neurodevelopmental delays and rare genetic disorders with precision medicine approach.
                   </p>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Key Expert</h4>
-                    <p className="text-sm text-gray-700">Dr. Suma Shankar</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Key Expert</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">Dr. Suma Shankar</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Focus</h4>
-                    <p className="text-sm text-gray-700">West Coast regional care</p>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-2">Focus</h4>
+                    <p className="text-sm text-gray-700 dark:text-[#CBD5E1]">West Coast regional care</p>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Contact</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Contact</h4>
                     <div className="space-y-2">
                       <a 
                         href="tel:800-482-3284"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-purple-600 transition-colors p-3 rounded-lg hover:bg-purple-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-brand-accent transition-colors p-3 rounded-lg hover:bg-[#FFF8E5] dark:hover:bg-[#1E293B] -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'ucdavis_phone_referral',
@@ -1983,12 +2007,12 @@ export default function App() {
                           contact_type: 'phone'
                         })}
                       >
-                        <Phone className="h-5 w-5 flex-shrink-0 text-purple-600" aria-hidden="true" />
+                        <Phone className="h-5 w-5 flex-shrink-0 text-brand-accent" aria-hidden="true" />
                         <span className="font-medium">800-4-UCDAVIS</span>
                       </a>
                       <a 
                         href="tel:916-703-0300"
-                        className="flex items-center gap-2.5 text-sm text-gray-900 hover:text-purple-600 transition-colors p-3 rounded-lg hover:bg-purple-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-[#F8FAFC] hover:text-brand-accent transition-colors p-3 rounded-lg hover:bg-[#FFF8E5] dark:hover:bg-[#1E293B] -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_contact', {
                           event_category: 'medical_resource',
                           event_label: 'ucdavis_phone_clinic',
@@ -1996,20 +2020,20 @@ export default function App() {
                           contact_type: 'phone'
                         })}
                       >
-                        <Phone className="h-5 w-5 flex-shrink-0 text-purple-600" aria-hidden="true" />
+                        <Phone className="h-5 w-5 flex-shrink-0 text-brand-accent" aria-hidden="true" />
                         <span className="font-medium">916-703-0300 (Clinic)</span>
                       </a>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Resources</h4>
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-[#F8FAFC] uppercase tracking-wide mb-3">Resources</h4>
                     <div className="space-y-2">
                       <a 
                         href="https://health.ucdavis.edu/mind-institute/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2.5 text-sm text-purple-600 hover:text-purple-700 hover:underline transition-colors p-3 rounded-lg hover:bg-purple-50 -mx-3 min-h-[44px]"
+                        className="flex items-center gap-2.5 text-sm text-brand-accent hover:text-brand-accent-hover hover:underline transition-colors p-3 rounded-lg hover:bg-[#FFF8E5] dark:hover:bg-[#1E293B] -mx-3 min-h-[44px]"
                         onClick={() => trackEvent('center_of_excellence_website', {
                           event_category: 'medical_resource',
                           event_label: 'ucdavis_mind_institute',
@@ -2027,14 +2051,14 @@ export default function App() {
             </Card>
           </div>
           
-          <p className="text-xs sm:text-sm text-center text-gray-500 mt-6 px-2">
+          <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-[#94A3B8] mt-6 px-2">
             These centers provide comprehensive, specialized care for BPAN and related NBIA disorders. Contact them directly for referrals and appointments.
           </p>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section id="final-cta" aria-labelledby="final-cta-heading" className="w-full py-8 sm:py-12 lg:py-16 px-3 sm:px-4 lg:px-6 bg-gradient-to-r from-blue-600 to-purple-600">
+      <section id="final-cta" aria-labelledby="final-cta-heading" className="w-full py-8 sm:py-12 lg:py-16 px-3 sm:px-4 lg:px-6 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#0F172A] dark:to-[#E6A100]">
         <div className="max-w-4xl mx-auto w-full text-center">
           <h2 id="final-cta-heading" className="text-xl sm:text-2xl lg:text-3xl text-white mb-3 sm:mb-5 px-1 leading-tight">
             You Can Change a Child's Future – Starting with Delaney
@@ -2292,7 +2316,7 @@ export default function App() {
           {/* SC 2.1.2: Focus trap — Tab and Shift+Tab cycle within the modal */}
           <div 
             ref={transcriptModalRef}
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-[#0B1220] rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key !== 'Tab') return;
@@ -2310,13 +2334,13 @@ export default function App() {
             }}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 id="transcript-title" className="text-xl sm:text-2xl text-gray-900">
+            <div className="sticky top-0 bg-white dark:bg-[#0B1220] border-b border-gray-200 dark:border-[#1E293B] px-6 py-4 flex items-center justify-between">
+              <h2 id="transcript-title" className="text-xl sm:text-2xl text-gray-900 dark:text-[#F8FAFC]">
                 Video Transcript: Delaney's Joyful Moment
               </h2>
               <button
                 onClick={() => setShowTranscript(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 dark:text-[#CBD5E1] dark:hover:text-[#F8FAFC] transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1E293B]"
                 aria-label="Close transcript"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2327,7 +2351,7 @@ export default function App() {
 
             {/* Modal Content */}
             <div className="px-6 py-5">
-              <div id="transcript-description" className="prose prose-sm sm:prose max-w-none text-gray-700">
+              <div id="transcript-description" className="prose prose-sm sm:prose max-w-none text-gray-700 dark:text-[#CBD5E1]">
                 <p className="text-sm sm:text-base leading-relaxed mb-4">
                   <strong>Scene:</strong> A heartwarming moment capturing Delaney's spirit and joy.
                 </p>
@@ -2337,7 +2361,7 @@ export default function App() {
                 <p className="text-sm sm:text-base leading-relaxed mb-4">
                   <strong>Background music:</strong> Acoustic Guitar 1 by Audionautix (licensed under Creative Commons CC BY 4.0)
                 </p>
-                <p className="text-xs text-gray-500 italic">
+                <p className="text-xs text-gray-500 dark:text-[#94A3B8] italic">
                   Note: This is a general description. For the complete audio content, please enable captions when watching the <a 
                     href="https://www.youtube.com/watch?v=xbpCgGgdjWk" 
                     target="_blank" 

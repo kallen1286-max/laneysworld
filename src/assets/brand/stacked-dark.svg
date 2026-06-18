@@ -7,13 +7,13 @@
     </g>
   </g>
   <text x="300.0" y="255.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
-        font-weight="600" font-size="56" fill="currentColor" letter-spacing="14">LANEY'S</text>
+        font-weight="600" font-size="56" fill="#F8FAFC" letter-spacing="14">LANEY'S</text>
   <text x="300.0" y="325.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
-        font-weight="600" font-size="56" fill="currentColor" letter-spacing="14">WORLD</text>
+        font-weight="600" font-size="56" fill="#F8FAFC" letter-spacing="14">WORLD</text>
   <text x="300.0" y="381.0" text-anchor="middle" font-family="Lora, Georgia, serif"
-        font-weight="400" font-style="italic" font-size="24" fill="currentColor" fill-opacity="0.72"
+        font-weight="400" font-style="italic" font-size="24" fill="#F8FAFC" fill-opacity="0.72"
         letter-spacing="0.5">Horizon of hope for BPAN</text>
   <text x="300.0" y="421.0" text-anchor="middle" font-family="Montserrat, system-ui, sans-serif"
-        font-weight="600" font-size="12" fill="currentColor" fill-opacity="0.6"
+        font-weight="600" font-size="12" fill="#F8FAFC" fill-opacity="0.6"
         letter-spacing="5">BPAN AWARENESS</text>
 </svg>

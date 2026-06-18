@@ -73,6 +73,15 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: rgb(180, 180, 180);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* ── Horizon Wordmark brand palette (light mode) ───────────────────────── */
+  --brand-ink: #0f172a;          /* Midnight — primary text */
+  --brand-ink-muted: #475569;    /* Steel — tagline / muted text */
+  --brand-accent: #e6a100;       /* Horizon Ochre — accent / CTA */
+  --brand-accent-hover: #c98800; /* darker ochre — CTA hover */
+  --brand-surface: #ffffff;      /* page surface */
+  --brand-surface-alt: #f7f7f4;  /* subtle alt surface */
+  --brand-border: #e5e7eb;       /* hairline borders */
 }
 
 .dark {
@@ -154,6 +163,15 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: rgb(112, 112, 112);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* ── Horizon Wordmark brand palette (dark mode) ────────────────────────── */
+  --brand-ink: #f8fafc;          /* Ice — primary text */
+  --brand-ink-muted: #cbd5e1;    /* Ice Muted — muted text */
+  --brand-accent: #ffb81c;       /* brightened Ochre for dark surfaces */
+  --brand-accent-hover: #e6a100; /* base Ochre — CTA hover on dark */
+  --brand-surface: #0b1220;      /* page surface */
+  --brand-surface-alt: #0f172a;  /* Midnight alt surface */
+  --brand-border: #1e293b;       /* hairline borders */
 }
 
 @theme inline {
@@ -195,6 +213,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand tokens exposed as Tailwind colors (flip automatically with .dark) */
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-alt: var(--brand-surface-alt);
+  --color-brand-border: var(--brand-border);
 }
 
 @layer base {
@@ -203,10 +230,32 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    /* Page surface + text flip with theme via the Horizon brand tokens. */
+    background-color: var(--brand-surface);
+    color: var(--brand-ink);
     /* iOS Safe Area Support - prevents content from being cut off by notch/home indicator */
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ── Brand accent helpers ───────────────────────────────────────────────────
+ * Small utilities so the primary CTA/link color can be referenced without
+ * repeating arbitrary-value syntax everywhere. They read the theme-aware
+ * --brand-accent token, so they automatically flip in dark mode.
+ */
+@layer utilities {
+  .text-brand-accent {
+    color: var(--brand-accent);
+  }
+  .bg-brand-accent {
+    background-color: var(--brand-accent);
+  }
+  .hover\:text-brand-accent-hover:hover {
+    color: var(--brand-accent-hover);
+  }
+  .hover\:bg-brand-accent-hover:hover {
+    background-color: var(--brand-accent-hover);
   }
 }
 
@@ -307,13 +356,6 @@ html {
   /* Add page breaks appropriately */
   section {
     page-break-inside: avoid;
-  }
-}
-
-/* Dark Mode - Logo Support */
-@media (prefers-color-scheme: dark) {
-  img[alt*="Delaney's World"] {
-    filter: brightness(1.1) contrast(0.95);
   }
 }
 
