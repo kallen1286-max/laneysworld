@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { ArrowLeft, Heart, Shield, Eye, Trash2, Mail, ExternalLink, Lock, FileText, Camera } from 'lucide-react';
-import laneysWorldLogo from 'figma:asset/098025f9056d201a154be344dcf4936569c25264.png';
+import stackedLightSvg from '../../assets/brand/stacked-light.svg';
+import stackedDarkSvg from '../../assets/brand/stacked-dark.svg';
 
 interface PrivacyPolicyProps {
   onBack: () => void;
@@ -37,8 +39,20 @@ function Section({ id, icon, title, children }: SectionProps) {
 }
 
 export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
+  useEffect(() => {
+    const obs = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  const logoStacked = isDark ? stackedDarkSvg : stackedLightSvg;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-[#0B1220] dark:to-[#0F172A]">
       {/* Top Nav */}
       <nav aria-label="Privacy policy navigation" className="sticky top-0 z-40 bg-white dark:bg-[#0B1220] border-b border-gray-200 dark:border-[#1E293B] shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
@@ -64,11 +78,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             aria-label="Go back to Delaney's World home page"
           >
             <img
-              src={laneysWorldLogo}
+              src={logoStacked}
               alt="Delaney's World"
-              className="w-24 h-auto rounded-2xl mx-auto"
-              width={96}
-              height={96}
+              className="w-48 sm:w-56 h-auto mx-auto"
               loading="eager"
             />
           </button>
