@@ -19,8 +19,11 @@ import delaneyDadSunsetHeroImage from 'figma:asset/b2d2fff468f3870a27738c2bbc252
 import delaneyFamilyFarmImage from 'figma:asset/2d9cfc58c306febc731ea9f6c6f5ab4ec0f2cff0.png';
 import delaneyDadNewImage from 'figma:asset/2e11e1f5c3597beb16397a3aba515293c8ec6cb7.png';
 import delaneyIceCreamDadImage from 'figma:asset/843a35f5dd3cd234c6c26e5d455cdf8b8748171d.png';
-import laneysWorldLogo from 'figma:asset/098025f9056d201a154be344dcf4936569c25264.png';
-import brandMarkIcon from '../assets/brand-mark-icon.png';
+// Brand assets — Horizon Wordmark (June 2026 redesign)
+// SVG sources live in src/assets/brand/. Public PNG fallbacks live in /brand/ for meta tags and crawlers.
+import laneysWorldLogo from '../assets/brand/horizontal-light.svg';
+import laneysWorldStacked from '../assets/brand/stacked-light.svg';
+import brandMarkIcon from '../assets/brand/icon-transparent.svg';
 import { researchArticles, lastUpdated } from './data/research-articles';
 import { Link } from './components/ui/link';
 import { Toaster } from './components/ui/sonner';
@@ -353,10 +356,11 @@ export default function App() {
       { property: 'og:title', content: "Delaney's World | Fighting BPAN - Rare Disease Charity for Gene Therapy Research" },
       { property: 'og:description', content: `Meet Delaney, a brave ${delaneyAge}-year-old with BPAN. Support gene therapy research for this rare neurodegenerative disease. Donate to give hope.` },
       { property: 'og:type', content: 'website' },
-      { property: 'og:image', content: laneysWorldLogo },
-      { property: 'og:image:secure_url', content: laneysWorldLogo },
+      // OG image is a 1200x630 social card — must be a public absolute-URL PNG/JPG, not an inline SVG.
+      { property: 'og:image', content: 'https://www.laneysworld.com/og-image.jpg' },
+      { property: 'og:image:secure_url', content: 'https://www.laneysworld.com/og-image.jpg' },
       { property: 'og:image:type', content: 'image/png' },
-      { property: 'og:image:alt', content: "Delaney's World - Anchored in Love & Joy - BPAN Awareness logo" },
+      { property: 'og:image:alt', content: "Delaney's World \u2014 Horizon of hope for BPAN" },
       { property: 'og:image:width', content: '1200' },
       { property: 'og:image:height', content: '630' },
       { property: 'og:url', content: window.location.href.split('?')[0].split('#')[0] },
@@ -382,8 +386,8 @@ export default function App() {
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: "Delaney's World | Fighting BPAN - Rare Disease Charity" },
       { name: 'twitter:description', content: `Meet Delaney, a brave ${delaneyAge}-year-old with BPAN. Support gene therapy research for this rare neurodegenerative disease. Donate to give hope.` },
-      { name: 'twitter:image', content: laneysWorldLogo },
-      { name: 'twitter:image:alt', content: "Delaney's World - Anchored in Love & Joy - BPAN Awareness logo" }
+      { name: 'twitter:image', content: 'https://www.laneysworld.com/og-image.jpg' },
+      { name: 'twitter:image:alt', content: "Delaney's World \u2014 Horizon of hope for BPAN" }
     ];
     
     twitterTags.forEach(tag => {
@@ -420,7 +424,7 @@ export default function App() {
       document.head.appendChild(linkFavicon);
     }
     linkFavicon.setAttribute('type', 'image/png');
-    linkFavicon.setAttribute('href', laneysWorldLogo);
+    linkFavicon.setAttribute('href', '/favicon-32.png');
     
     // Apple Touch Icon (for iOS home screen)
     let linkAppleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
@@ -429,7 +433,7 @@ export default function App() {
       linkAppleTouchIcon.setAttribute('rel', 'apple-touch-icon');
       document.head.appendChild(linkAppleTouchIcon);
     }
-    linkAppleTouchIcon.setAttribute('href', laneysWorldLogo);
+    linkAppleTouchIcon.setAttribute('href', '/apple-touch-icon.png');
     
     // ========================================
     // SCHEMA.ORG STRUCTURED DATA (JSON-LD)
@@ -445,7 +449,7 @@ export default function App() {
           "@id": `${window.location.origin}/#organization`,
           "name": "Delaney's World",
           "url": window.location.origin,
-          "logo": laneysWorldLogo,
+          "logo": "https://www.laneysworld.com/brand/horizontal-light.png",
           "description": "Supporting BPAN research and raising awareness for Beta-propeller Protein-Associated Neurodegeneration through Delaney's story. A rare disease charity focused on funding gene therapy research for children with BPAN.",
           "foundingDate": "2024",
           "founder": {
@@ -694,7 +698,7 @@ export default function App() {
         "name": "Delaney's World",
         "logo": {
           "@type": "ImageObject",
-          "url": laneysWorldLogo
+          "url": "https://www.laneysworld.com/og-image.jpg"
         }
       }
     };
@@ -767,9 +771,9 @@ export default function App() {
             className="flex flex-col items-center gap-4"
           >
             <img 
-              src={laneysWorldLogo} 
-              alt="Delaney's World" 
-              className="w-48 h-auto rounded-2xl"
+              src={laneysWorldStacked} 
+              alt="Delaney's World \u2014 Horizon of hope for BPAN" 
+              className="w-56 h-auto"
             />
             {/* Visual spinner — aria-hidden; the sr-only div below is the sole live-region (SC 4.1.3) */}
             <motion.div
@@ -807,13 +811,11 @@ export default function App() {
           >
             <img 
               src={laneysWorldLogo} 
-              alt="Delaney's World" 
-              className="w-16 h-auto rounded-lg"
-              width={64}
-              height={64}
+              alt="Delaney's World \u2014 Horizon of hope for BPAN" 
+              className="h-10 sm:h-12 w-auto"
+              height={48}
               loading="eager"
             />
-            <span className="hidden sm:inline font-semibold text-gray-900 text-lg">Delaney's World</span>
           </button>
           <div className="flex items-center gap-2 sm:gap-3">
             <button
@@ -1025,11 +1027,11 @@ export default function App() {
             {/* Brand-mark lockup — paired with the "Anchored in Love & Joy" heading whose wordmark it carries */}
             <div className="flex justify-center mb-3 sm:mb-4">
               <img
-                src={laneysWorldLogo}
-                alt="Delaney's World - Anchored in Love & Joy - BPAN Awareness"
-                className="w-36 sm:w-44 lg:w-52 h-auto rounded-2xl"
-                width={208}
-                height={208}
+                src={laneysWorldStacked}
+                alt="Delaney's World \u2014 Horizon of hope for BPAN"
+                className="w-48 sm:w-56 lg:w-64 h-auto"
+                width={256}
+                height={239}
                 loading="lazy"
               />
             </div>
@@ -2091,9 +2093,9 @@ export default function App() {
             <img 
               src={brandMarkIcon} 
               alt="Delaney's World" 
-              className="w-20 sm:w-24 h-auto opacity-95 hover:opacity-100 hover:scale-105 transition-all duration-300"
-              width={96}
-              height={96}
+              className="w-16 sm:w-20 h-auto opacity-95 hover:opacity-100 hover:scale-105 transition-all duration-300"
+              width={80}
+              height={80}
               loading="lazy"
             />
           </div>
