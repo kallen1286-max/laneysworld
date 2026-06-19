@@ -6,6 +6,50 @@ A charity website raising awareness and funding for BPAN (Beta-propeller Protein
 
 🌐 **Live site:** [laneysworld.com](https://www.laneysworld.com)
 
+**Current release:** [v2.0.0](https://github.com/kallen1286-max/laneysworld/releases/tag/v2.0.0) — Horizon Wordmark brand identity + dynamic dark mode
+
+---
+
+## Brand & Design System
+
+### Horizon Wordmark (shipped June 18, 2026)
+
+The "Laney's World" wordmark uses the **sun-rising-over-horizon** mark with the sun replacing the `O` in the wordmark, paired with the tagline "Horizon of hope for BPAN."
+
+**Palette:**
+
+| Token | Hex | Role |
+|-------|-----|------|
+| Midnight | `#0F172A` | Light-mode text |
+| Ice | `#F8FAFC` | Dark-mode text |
+| Horizon Ochre | `#E6A100` | Brand accent (sun, CTAs) |
+| Steel | `#475569` | Tagline / muted text on light |
+| Ice Muted | `#CBD5E1` | Tagline / muted text on dark |
+
+**Logo assets** (all in `src/assets/brand/`):
+
+| File | Use |
+|------|-----|
+| `horizontal-light.svg` / `horizontal-dark.svg` | Sticky nav, loading screen — theme-aware swap |
+| `stacked-light.svg` / `stacked-dark.svg` | Anchored section, Privacy Policy page — theme-aware swap |
+| `icon-transparent.svg` | Footer mark (Ochre sun only, theme-neutral) |
+| `icon-light.svg` | Reserved for Ice-background placements |
+
+Public PNG fallbacks (referenced by JSON-LD / OG meta) live in `public/brand/`:
+`horizontal-light.png`, `stacked-light.png`, `icon-transparent.png`.
+
+### Dynamic Dark Mode (OS-driven)
+
+As of v2.0.0, the site honors `prefers-color-scheme` automatically:
+
+- **Anti-FOUC:** inline script in `index.html` sets `.dark` on `<html>` before CSS paints.
+- **Live updates:** `src/main.tsx` adds a `matchMedia` listener so the theme tracks live OS changes without a reload.
+- **Tokens:** `src/styles/globals.css` exposes `--brand-ink`, `--brand-ink-muted`, `--brand-accent`, `--brand-surface`, `--brand-surface-alt`, and `--brand-border` via `@theme inline` so Tailwind sees `bg-brand-accent` / `text-brand-accent` etc.
+- **Logo theme swap:** a `MutationObserver` on `<html>.class` drives an `isDark` state; horizontal and stacked wordmark `<img src>` attributes swap to dark SVG variants in dark mode. The footer Ochre-sun stays neutral.
+- **Categorical color cards** (medical centers, science flowchart, Essential Resource highlight) intentionally stay light in both modes — they're "islands of light" on the dark page surface.
+
+There is **no manual toggle** — OS-only by design.
+
 ---
 
 ## Architecture
@@ -259,21 +303,37 @@ laneysworld/
 ├── public/                   # Copied verbatim to dist/ root
 │   ├── robots.txt
 │   ├── sitemap.xml
-│   ├── og-image.jpg          # 1200x630 social card
-│   └── logo.png              # 512x512 (referenced by JSON-LD)
+│   ├── og-image.jpg          # 1200x630 social card (Horizon Wordmark, v=3 cache-bust)
+│   ├── favicon.ico           # 48x48 multi-frame ICO (Ochre sun)
+│   ├── favicon.png           # 64x64 PNG fallback
+│   ├── favicon-16.png        # 16x16 PNG (Ochre sun)
+│   ├── favicon-32.png        # 32x32 PNG (Ochre sun)
+│   ├── apple-touch-icon.png  # 180x180 (Ochre sun)
+│   └── brand/                # Public PNG renditions referenced by JSON-LD / OG
+│       ├── horizontal-light.png
+│       ├── stacked-light.png
+│       └── icon-transparent.png
 ├── scripts/
 │   └── optimize-images.mjs   # sharp / MozJPEG image pre-processor
 ├── src/                      # React + TypeScript app
-│   ├── main.tsx
+│   ├── main.tsx              # React mount + prefers-color-scheme listener
 │   ├── app/
-│   │   ├── App.tsx           # Lazy-loads FeedbackModal + PrivacyPolicy
+│   │   ├── App.tsx           # Lazy-loads FeedbackModal + PrivacyPolicy; isDark hook
 │   │   ├── components/
+│   │   │   ├── ui/           # 5 actively used shadcn primitives only (button, card, link, sonner, utils)
+│   │   │   ├── FeedbackModal.tsx
+│   │   │   ├── PrivacyPolicy.tsx
+│   │   │   ├── animated-poem.tsx
+│   │   │   └── science-flowchart.tsx
 │   │   ├── data/
 │   │   └── utils/
 │   │       └── analytics.ts  # trackEvent SDK — dual-writes to GA4 + POST /e,
 │   │                          # honors GPC/DNT, uses sendBeacon when available
-│   ├── assets/               # Optimized hero/photo images
+│   ├── assets/
+│   │   ├── brand/            # Horizon Wordmark SVGs (light/dark variants)
+│   │   └── [photos].png      # Optimized hero/photo images
 │   └── styles/
+│       └── globals.css       # Tailwind v4 + brand tokens for light/dark
 ├── server/                   # Express backend
 │   ├── package.json          # express + cors + pg (helmet hoisted from root)
 │   ├── index.mjs             # /health, /e, /feedback, helmet+CSP, static dist/
@@ -374,7 +434,36 @@ Set `VITE_API_URL=http://localhost:3001` in `.env` to point the dev frontend at 
   - **PR #10:** Added `pg`, `server/db.mjs`, `sessions` + `events` schema, migration runner, `/health` DB ping.
   - **PR #11:** `POST /e` ingest endpoint with `anon_id` cookie, GPC + DNT honoring (fully silent), token-bucket rate limit, allow-listed event names, 90-day retention via `pnpm run db:purge`. Privacy Policy updated.
   - **PR #12:** Frontend `trackEvent`/`trackPageView` SDK dual-writes to GA4 and `POST /e` (via `sendBeacon`); wires `page_view`, `section_view`, `video_play`, donate clicks, share, feedback, and external-link events.
-- **GA4 status:** kept in parallel for ~1 week to validate; full removal scheduled as PR #13.
+
+### June 18, 2026 — Horizon Wordmark Brand Identity (PRs #13–#17)
+
+- **PR #13** — Initial wing-silhouette brand mark + favicon set + refreshed OG image.
+- **PR #14** — Tightened hero rhythm; switched footer to icon-only Ochre-sun mark.
+- **PR #15** — Moved full lockup from hero into the "Anchored in Love & Joy" section.
+- **PR #16** — Full Horizon Wordmark rollout: 5 logo touchpoints swapped, favicon/apple-touch/OG regenerated, JSON-LD updated, theme-color flipped to `#0F172A`.
+- **PR #17** — Stripped baked white backdrop from logo SVGs (transparent placement on all surfaces, including the Anchored gradient).
+
+### June 18, 2026 — Dynamic Dark Mode + Horizon Palette Sweep (PR #18)
+
+- **Change:** OS-driven `.dark` class on `<html>` via inline anti-FOUC script + live `matchMedia` listener. Brand tokens (`--brand-ink`, `--brand-accent`, `--brand-surface`, etc.) defined for both modes via `@theme inline`.
+- **Sweep:** 41 hardcoded `purple-*` / `pink-*` / `lavender-*` refs replaced with semantic tokens across `App.tsx`, `science-flowchart.tsx`, `FeedbackModal.tsx`, `animated-poem.tsx`, `PrivacyPolicy.tsx`. ~115 `text-gray-*` / `bg-white` refs given `dark:` variants.
+- **Logo theme swap:** `MutationObserver` watches `<html>.class`; wordmark `<img src>` swaps to dark SVG when `.dark` active. Footer Ochre-sun stays theme-neutral.
+- **Anchored + final-CTA gradients** preserved in light mode; Midnight→Ochre treatment in dark.
+
+### June 18, 2026 — Privacy Page Logo + Codebase Cleanup (PR #19)
+
+- **Privacy Policy page** still imported the legacy purple BPAN-silhouette PNG as a thumbnail. Swapped for theme-aware stacked Horizon Wordmark; bumped to `w-48 sm:w-56` so it reads as a brand mark.
+- **Cleanup:** Deleted 44 unused shadcn/ui primitives (only `button`, `card`, `link`, `sonner`, `utils.ts` were imported by app code). Removed the orphan legacy silhouette PNG.
+- **Impact:** 45 files removed, ~4,940 LOC deleted. CSS bundle: **127.67 kB → 67.98 kB (gzip 19.89 → 11.35, −47%)**.
+
+### June 18, 2026 — Favicon Cache-Bust (PR #20)
+
+- Added `?v=2` query string to all favicon `<link>` tags so browsers re-fetch the new Ochre-sun favicon instead of serving the cached legacy purple silhouette from bookmarks and the address bar.
+
+### June 18, 2026 — Dark-Mode Contrast Repair (PR #21)
+
+- PR #18's blanket `dark:text-Ice` sweep applied to text inside categorical color cards (medical centers, science flowchart, Essential Resource) that intentionally keep light surfaces in dark mode — producing white-on-near-white ghost text.
+- **Fix:** Stripped `dark:text-*` overrides from those cards (they stay light in both modes — "islands of light" pattern). Added `dark:` gradient variant to the Find Expert Care section wrapper. Normalized the science flowchart's purple card #4 to match its categorical siblings.
 
 ---
 
