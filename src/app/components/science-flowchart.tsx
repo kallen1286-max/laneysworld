@@ -67,7 +67,7 @@ export function ScienceFlowchart() {
                     <Dna className="h-8 w-8 text-white" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] text-center mb-1.5">
+                <h3 className="text-lg font-bold text-gray-900 text-center mb-1.5">
                   The Gene
                 </h3>
                 <div className="bg-blue-100 rounded-md px-2 py-1 mb-1.5">
@@ -75,7 +75,7 @@ export function ScienceFlowchart() {
                     WDR45 Gene
                   </p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug text-center flex-1 mb-1.5">
+                <p className="text-sm text-gray-600 leading-snug text-center flex-1 mb-1.5">
                   Provides instructions for <span className="font-medium text-blue-800">autophagy</span>—cellular cleanup
                 </p>
                 <div className="flex items-center justify-center gap-1 text-blue-600 text-xs font-medium group-hover:text-blue-800">
@@ -117,7 +117,7 @@ export function ScienceFlowchart() {
                     <AlertTriangle className="h-8 w-8 text-white" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] text-center mb-1.5">
+                <h3 className="text-lg font-bold text-gray-900 text-center mb-1.5">
                   The Mutation
                 </h3>
                 <div className="bg-orange-100 rounded-md px-2 py-1 mb-1.5">
@@ -125,7 +125,7 @@ export function ScienceFlowchart() {
                     Spontaneous Change
                   </p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug text-center flex-1 mb-1.5">
+                <p className="text-sm text-gray-600 leading-snug text-center flex-1 mb-1.5">
                   Random mutation <span className="font-medium text-orange-800">not inherited</span>—disrupts the gene
                 </p>
                 <div className="flex items-center justify-center gap-1 text-orange-600 text-xs font-medium group-hover:text-orange-800">
@@ -170,7 +170,7 @@ export function ScienceFlowchart() {
                     <XCircle className="h-8 w-8 text-white" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] text-center mb-1.5">
+                <h3 className="text-lg font-bold text-gray-900 text-center mb-1.5">
                   The Problem
                 </h3>
                 <div className="bg-red-100 rounded-md px-2 py-1 mb-1.5">
@@ -178,7 +178,7 @@ export function ScienceFlowchart() {
                     Autophagy Fails
                   </p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug text-center flex-1 mb-1.5">
+                <p className="text-sm text-gray-600 leading-snug text-center flex-1 mb-1.5">
                   Cells can't <span className="font-medium text-red-800">recycle proteins</span>, affecting brain cells
                 </p>
                 <div className="flex items-center justify-center gap-1 text-red-600 text-xs font-medium group-hover:text-red-800">
@@ -210,7 +210,7 @@ export function ScienceFlowchart() {
               link_location: 'science_flowchart'
             })}
           >
-            <Card className="h-full border-2 border-purple-300 dark:border-purple-700 bg-gradient-to-br from-purple-50 to-white dark:from-[#1E293B] dark:to-[#0F172A] hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+            <Card className="h-full border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-white hover:border-purple-500 hover:shadow-xl transition-all duration-300">
               <CardContent className="p-3 flex flex-col h-full relative">
                 <div className="absolute top-1.5 right-1.5 bg-purple-600 dark:bg-purple-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" aria-hidden="true">
                   4
@@ -220,18 +220,18 @@ export function ScienceFlowchart() {
                     <Brain className="h-8 w-8 text-white" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] text-center mb-1.5">
+                <h3 className="text-lg font-bold text-gray-900 text-center mb-1.5">
                   The Result
                 </h3>
                 <div className="bg-purple-100 dark:bg-purple-900/40 rounded-md px-2 py-1 mb-1.5">
-                  <p className="text-sm font-semibold text-purple-900 dark:text-purple-200 text-center">
+                  <p className="text-sm font-semibold text-purple-900 text-center">
                     Iron Buildup
                   </p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug text-center flex-1 mb-1.5">
-                  Iron accumulates in <span className="font-medium text-purple-800 dark:text-purple-300">basal ganglia</span>, causing symptoms
+                <p className="text-sm text-gray-600 leading-snug text-center flex-1 mb-1.5">
+                  Iron accumulates in <span className="font-medium text-purple-800">basal ganglia</span>, causing symptoms
                 </p>
-                <div className="flex items-center justify-center gap-1 text-purple-600 dark:text-purple-300 text-xs font-medium group-hover:text-purple-800 dark:group-hover:text-purple-200">
+                <div className="flex items-center justify-center gap-1 text-purple-600 text-xs font-medium group-hover:text-purple-800">
                   <ExternalLink className="h-3 w-3" />
                   <span>Learn more</span>
                 </div>
@@ -265,7 +265,7 @@ export function ScienceFlowchart() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] mb-1.5">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1.5">
                     The Hope: Gene Therapy Research
                   </h3>
                   <div className="bg-green-100 rounded-md px-2.5 py-1 mb-1.5 inline-block">
@@ -273,7 +273,7 @@ export function ScienceFlowchart() {
                       Correcting or compensating for the WDR45 mutation
                     </p>
                   </div>
-                  <p className="text-base text-gray-600 dark:text-[#CBD5E1] leading-relaxed mb-1.5">
+                  <p className="text-base text-gray-600 leading-relaxed mb-1.5">
                     Scientists are developing gene therapy to restore WDR45 function, potentially <span className="font-medium text-green-800">stopping or reversing</span> the disease.{' '}
                     <a 
                       href="#research"
@@ -343,13 +343,13 @@ export function ScienceFlowchart() {
             },
             purple: {
               border: 'border-purple-300 dark:border-purple-700 hover:border-purple-500',
-              bg: 'bg-gradient-to-br from-purple-50 to-white dark:from-[#1E293B] dark:to-[#0F172A]',
+              bg: 'bg-gradient-to-br from-purple-50 to-white',
               badge: 'bg-purple-600 dark:bg-purple-500',
               icon: 'bg-gradient-to-br from-purple-500 to-purple-600',
               badgeBg: 'bg-purple-100 dark:bg-purple-900/40',
-              badgeText: 'text-purple-900 dark:text-purple-200',
-              highlight: 'text-purple-800 dark:text-purple-300',
-              link: 'text-purple-600 dark:text-purple-300'
+              badgeText: 'text-purple-900',
+              highlight: 'text-purple-800',
+              link: 'text-purple-600'
             }
           };
           
@@ -382,7 +382,7 @@ export function ScienceFlowchart() {
                         <Icon className="h-5.5 w-5.5 text-white" aria-hidden="true" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-[#F8FAFC] mb-1">
+                        <h3 className="text-base font-bold text-gray-900 mb-1">
                           {step.title}
                         </h3>
                         <div className={`${colors.badgeBg} rounded px-2 py-0.5 mb-1 inline-block`}>
@@ -390,7 +390,7 @@ export function ScienceFlowchart() {
                             {step.badge}
                           </p>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug mb-1">
+                        <p className="text-sm text-gray-600 leading-snug mb-1">
                           {step.text} <span className={`font-medium ${colors.highlight}`}>{step.highlight}</span>{step.suffix}
                         </p>
                         <div className={`flex items-center gap-1 ${colors.link} text-xs font-medium`}>
@@ -434,7 +434,7 @@ export function ScienceFlowchart() {
                   <Microscope className="h-5.5 w-5.5 text-white" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-gray-900 dark:text-[#F8FAFC] mb-1">
+                  <h3 className="text-base font-bold text-gray-900 mb-1">
                     The Hope: Gene Therapy Research
                   </h3>
                   <div className="bg-green-100 rounded px-2 py-0.5 mb-1 inline-block">
@@ -442,7 +442,7 @@ export function ScienceFlowchart() {
                       Correcting the WDR45 mutation
                     </p>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-[#CBD5E1] leading-snug mb-1">
+                  <p className="text-sm text-gray-600 leading-snug mb-1">
                     Gene therapy aims to <span className="font-medium text-green-800">restore WDR45 function</span>.{' '}
                     <a 
                       href="#research"
