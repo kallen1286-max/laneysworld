@@ -1554,12 +1554,12 @@ export default function App() {
                               <BookOpen className="h-4 w-4 text-blue-600" aria-hidden="true" />
                               <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Essential Resource</span>
                             </div>
-                            <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
+                            <span className="text-sm text-gray-700">{article.sourceText}</span>
                           </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors mb-2">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                             {article.title}
                           </h3>
-                          <p className="text-sm sm:text-base text-gray-700 dark:text-[#CBD5E1] leading-relaxed">
+                          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                             {article.description}
                           </p>
                         </div>
@@ -1646,7 +1646,7 @@ export default function App() {
       </section>
 
       {/* Centers of Excellence Section */}
-      <section id="centers-of-excellence" aria-labelledby="centers-heading" className="w-full py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6 bg-gradient-to-b from-blue-50 to-white">
+      <section id="centers-of-excellence" aria-labelledby="centers-heading" className="w-full py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6 bg-gradient-to-b from-blue-50 to-white dark:from-[#0B1220] dark:to-[#0F172A]">
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center justify-center gap-2 mb-3">
