@@ -259,28 +259,28 @@ To rotate the LaneysWorld key: create a new key at [resend.com/api-keys](https:/
 
 ## DNS Configuration (Porkbun)
 
-Last verified: June 8, 2026 (post-Railway cutover)
+Last verified: June 18, 2026 (live `dig` against `1.1.1.1`)
+
+All legacy Figma + inbound-SES records have been cleaned out of the Porkbun zone. The bare apex no longer resolves — only `www` is live, pointed at Railway. The active zone is purely: Railway hosting + Resend outbound mail + ACME certificate issuance.
 
 ### Live Records
 
 | Type | Host | Value | Purpose |
 |------|------|-------|---------|
 | CNAME | `www.laneysworld.com` | `kzwz52r1.up.railway.app` | Production traffic → Railway |
-| A | `laneysworld.com` | `204.69.207.1` | Apex (still pointed at Figma; redirect via `www` recommended) |
 | MX | `send.laneysworld.com` | `feedback-smtp.us-east-1.amazonses.com` (prio 10) | Resend bounce handling |
 | TXT | `laneysworld.com` | `v=spf1 include:amazonses.com ~all` | Root SPF |
 | TXT | `send.laneysworld.com` | `v=spf1 include:amazonses.com ~all` | Send subdomain SPF |
-| TXT | `resend._domainkey.laneysworld.com` | DKIM public key (RSA) | DKIM signing |
-| TXT | `_dmarc.laneysworld.com` | `v=DMARC1; p=quarantine; rua=mailto:...` | DMARC policy |
-| TXT | `_acme-challenge.laneysworld.com` | ACME challenge tokens | TLS certificate issuance |
+| TXT | `resend._domainkey.laneysworld.com` | DKIM public key (RSA) | Resend DKIM signing |
+| TXT | `_dmarc.laneysworld.com` | `v=DMARC1; p=quarantine; rua=mailto:...; ruf=mailto:...; fo=1` | DMARC policy (quarantine + aggregate/forensic reporting) |
+| TXT | `_railway-verify.www.laneysworld.com` | `railway-verify=<token>` | Railway custom-domain ownership proof |
+| TXT | `_acme-challenge.laneysworld.com` | ACME challenge tokens (rotates) | Let's Encrypt TLS issuance for Railway |
 
-### Records Pending Removal
+### Notes
 
-| Type | Host | Reason |
-|------|------|--------|
-| TXT | `_figma_sites_verify_www.laneysworld.com` | Figma Sites no longer used |
-| MX | `laneysworld.com` (inbound SES) | No active mailbox |
-| TXT | `default._domainkey.laneysworld.com` | Confirm Resend doesn't need it, then drop |
+- **No A record on the apex** (`laneysworld.com`). The previous Figma apex `A → 204.69.207.1` was removed during the Railway cutover. Visitors hitting the bare apex won't resolve — share `www.laneysworld.com` everywhere (the canonical URL in `index.html` and `sitemap.xml`).
+- **No inbound MX** on the root domain. There is no mailbox at `@laneysworld.com`; the only MX is on the `send.` subdomain for Resend bounce handling.
+- **Only `resend._domainkey` is in use for DKIM.** The legacy `default._domainkey` record from the old SES setup has been removed.
 
 ---
 
