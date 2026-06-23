@@ -1526,11 +1526,11 @@ export default function App() {
             </p>
           </div>
           
-          {/* Essential Medical Resource Spotlight - Moved to Top */}
+          {/* Essential Resource (pinned at top) */}
           {researchArticles
-            .filter(article => article.spotlight)
+            .filter(article => article.group === 'essential')
             .map((article) => (
-              <div key={article.id} className="mb-5 sm:mb-6">
+              <div key={article.id} className="mb-6 sm:mb-8">
                 <a
                   href={article.sourceUrl}
                   target="_blank"
@@ -1541,7 +1541,7 @@ export default function App() {
                     event_category: 'content_engagement',
                     event_label: article.sourceText,
                     article_title: article.title,
-                    is_spotlight: 'true',
+                    research_group: 'essential',
                     link_location: 'research_section'
                   })}
                 >
@@ -1569,79 +1569,145 @@ export default function App() {
                 </a>
               </div>
             ))}
-          
-          {/* Featured Articles */}
-          {researchArticles
-            .filter(article => article.featured)
-            .map((article) => (
-              <div key={article.id} className="mb-5 sm:mb-6">
-                <a
-                  href={article.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  aria-label={`${article.title} - Read more at ${article.sourceText} (opens in new window)`}
-                  onClick={() => trackEvent('research_article_click', {
-                    event_category: 'content_engagement',
-                    event_label: article.sourceText,
-                    article_title: article.title,
-                    is_featured: 'true',
-                    link_location: 'research_section'
-                  })}
-                >
-                  <Card className="p-3 sm:p-4 border border-gray-200 hover:border-gray-400 transition-all cursor-pointer min-h-[100px]">
-                    <CardContent className="p-0 flex flex-col">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <Star className="h-3.5 w-3.5 text-blue-600" aria-hidden="true" />
-                            <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
-                          </div>
-                          <h3 className="text-lg sm:text-xl text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors">
-                            {article.title}
-                          </h3>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </a>
-              </div>
-            ))}
 
-          {/* Research Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {researchArticles
-              .filter(article => !article.featured && !article.spotlight)
-              .slice(0, 6)
-              .map((article) => (
-                <a
-                  key={article.id}
-                  href={article.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  aria-label={`${article.title} - Read more at ${article.sourceText} (opens in new window)`}
-                  onClick={() => trackEvent('research_article_click', {
-                    event_category: 'content_engagement',
-                    event_label: article.sourceText,
-                    article_title: article.title,
-                    is_featured: 'false',
-                    link_location: 'research_section'
-                  })}
-                >
-                  <Card className="p-3 border border-gray-200 hover:border-gray-400 transition-all cursor-pointer h-full">
-                    <CardContent className="p-0 flex flex-col h-full">
-                      <div className="mb-1.5">
-                        <span className="text-sm text-gray-700 dark:text-[#CBD5E1]">{article.sourceText}</span>
-                      </div>
-                      <h4 className="text-base sm:text-lg text-gray-900 dark:text-[#F8FAFC] group-hover:text-blue-600 transition-colors leading-snug flex-1">
-                        {article.title}
-                      </h4>
-                    </CardContent>
-                  </Card>
-                </a>
-              ))}
-          </div>
+          {/* Grouped subsections — Latest Breakthroughs (open by default), then 3 collapsibles */}
+          {([
+            { group: 'breakthroughs',   label: 'Latest Breakthroughs',        sub: 'Peer-reviewed findings and major program milestones from the last 12 months.', open: true  },
+            { group: 'programs-trials', label: 'Research Programs & Trials',  sub: 'Active programs, clinics, and registries where families can follow or participate.', open: false },
+            { group: 'family-platform', label: 'NBIA Family & Platform Reads', sub: 'Adjacent NBIA disorders and gene therapy advances that inform BPAN strategy.', open: false },
+            { group: 'community',       label: 'Community & Foundations',     sub: 'Coordination, Centers of Excellence, and patient-family resources.', open: false },
+          ] as const).map(({ group, label, sub, open }) => {
+            const items = researchArticles.filter(a => a.group === group);
+            if (items.length === 0) return null;
+            return (
+              <details
+                key={group}
+                open={open}
+                className="group mb-4 sm:mb-5 border border-gray-200 dark:border-[#1E293B] rounded-lg bg-white dark:bg-[#0B1220] overflow-hidden"
+                onToggle={(e) => trackEvent('research_group_toggle', {
+                  event_category: 'content_engagement',
+                  event_label: group,
+                  is_open: (e.currentTarget as HTMLDetailsElement).open ? 'true' : 'false',
+                  link_location: 'research_section'
+                })}
+              >
+                <summary className="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer list-none hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">
+                      {label}
+                      <span className="ml-2 text-xs font-normal text-gray-500 dark:text-[#94A3B8]">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-[#CBD5E1] mt-0.5">{sub}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-500 dark:text-[#94A3B8] transition-transform duration-200 group-open:rotate-90 flex-shrink-0" aria-hidden="true" />
+                </summary>
+                <div className="px-4 pb-4 pt-1 grid sm:grid-cols-2 gap-3 sm:gap-4">
+                  {items.map((article) => (
+                    <a
+                      key={article.id}
+                      href={article.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block group/card focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
+                      aria-label={`${article.title} - Read more at ${article.sourceText} (opens in new window)`}
+                      onClick={() => trackEvent('research_article_click', {
+                        event_category: 'content_engagement',
+                        event_label: article.sourceText,
+                        article_title: article.title,
+                        research_group: group,
+                        link_location: 'research_section'
+                      })}
+                    >
+                      <Card className="p-3 sm:p-4 h-full border border-gray-200 dark:border-[#1E293B] hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer">
+                        <CardContent className="p-0 flex flex-col h-full">
+                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                            {article.badge && (
+                              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-blue-50 dark:bg-[#1E293B] text-blue-700 dark:text-[#93C5FD]">
+                                {article.badge}
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-500 dark:text-[#94A3B8]">{article.date}</span>
+                          </div>
+                          <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-[#F8FAFC] group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors leading-snug mb-1.5">
+                            {article.title}
+                          </h4>
+                          <p className="text-sm text-gray-700 dark:text-[#CBD5E1] leading-relaxed mb-2 flex-1">
+                            {article.description}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-[#94A3B8] mt-auto">
+                            <Star className="h-3 w-3 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                            <span>{article.sourceText}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  ))}
+                </div>
+              </details>
+            );
+          })}
+
+          {/* Archive (collapsed by default) */}
+          {researchArticles.some(a => a.group === 'archive') && (
+            <details
+              className="group mt-2 mb-2 border border-dashed border-gray-300 dark:border-[#1E293B] rounded-lg bg-gray-50 dark:bg-[#0B1220] overflow-hidden"
+              onToggle={(e) => trackEvent('research_group_toggle', {
+                event_category: 'content_engagement',
+                event_label: 'archive',
+                is_open: (e.currentTarget as HTMLDetailsElement).open ? 'true' : 'false',
+                link_location: 'research_section'
+              })}
+            >
+              <summary className="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer list-none hover:bg-gray-100 dark:hover:bg-[#0F172A] transition-colors">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-semibold text-gray-700 dark:text-[#CBD5E1]">
+                    Archive
+                    <span className="ml-2 text-xs font-normal text-gray-500 dark:text-[#94A3B8]">{researchArticles.filter(a => a.group === 'archive').length} items</span>
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-[#94A3B8] mt-0.5">Older entries retained for historical reference — superseded preprints, completed grants, and ongoing registries.</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-gray-500 dark:text-[#94A3B8] transition-transform duration-200 group-open:rotate-90 flex-shrink-0" aria-hidden="true" />
+              </summary>
+              <div className="px-4 pb-4 pt-1 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {researchArticles.filter(a => a.group === 'archive').map((article) => (
+                  <a
+                    key={article.id}
+                    href={article.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group/card focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
+                    aria-label={`${article.title} - Read more at ${article.sourceText} (opens in new window)`}
+                    onClick={() => trackEvent('research_article_click', {
+                      event_category: 'content_engagement',
+                      event_label: article.sourceText,
+                      article_title: article.title,
+                      research_group: 'archive',
+                      link_location: 'research_section'
+                    })}
+                  >
+                    <Card className="p-3 h-full border border-gray-200 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] hover:border-gray-400 transition-all cursor-pointer">
+                      <CardContent className="p-0 flex flex-col h-full">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          {article.badge && (
+                            <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-gray-100 dark:bg-[#1E293B] text-gray-600 dark:text-[#94A3B8]">
+                              {article.badge}
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-500 dark:text-[#94A3B8]">{article.date}</span>
+                        </div>
+                        <h4 className="text-sm sm:text-base font-medium text-gray-800 dark:text-[#CBD5E1] group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors leading-snug">
+                          {article.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-[#94A3B8] mt-2">
+                          <span>{article.sourceText}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </a>
+                ))}
+              </div>
+            </details>
+          )}
         </div>
       </section>
 
