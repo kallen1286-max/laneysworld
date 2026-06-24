@@ -1526,50 +1526,6 @@ export default function App() {
             </p>
           </div>
           
-          {/* Essential Resource (pinned at top) */}
-          {researchArticles
-            .filter(article => article.group === 'essential')
-            .map((article) => (
-              <div key={article.id} className="mb-6 sm:mb-8">
-                <a
-                  href={article.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  aria-label={`${article.title} - Read more at ${article.sourceText} (opens in new window)`}
-                  onClick={() => trackEvent('research_article_click', {
-                    event_category: 'content_engagement',
-                    event_label: article.sourceText,
-                    article_title: article.title,
-                    research_group: 'essential',
-                    link_location: 'research_section'
-                  })}
-                >
-                  <Card className="p-3 sm:p-4 border-2 border-blue-400 bg-gradient-to-r from-blue-50 to-white hover:border-blue-500 transition-all cursor-pointer min-h-[140px]">
-                    <CardContent className="p-0 flex flex-col">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center gap-1.5">
-                              <BookOpen className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                              <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Essential Resource</span>
-                            </div>
-                            <span className="text-sm text-gray-700">{article.sourceText}</span>
-                          </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
-                            {article.title}
-                          </h3>
-                          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            {article.description}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </a>
-              </div>
-            ))}
-
           {/* Grouped subsections — Latest Breakthroughs (open by default), then 3 collapsibles */}
           {([
             { group: 'breakthroughs',   label: 'Latest Breakthroughs',        sub: 'Peer-reviewed findings and major program milestones from the last 12 months.', open: true  },
