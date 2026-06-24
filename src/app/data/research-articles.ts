@@ -1,11 +1,10 @@
 // Research Articles Data
 // Last Updated: June 23, 2026
-// Structure: Essential Resource (spotlight) + 4 grouped subsections + Archive
+// Structure: 4 grouped subsections + Archive
 // Sources: PubMed, NBIA Disorders Association, GOSH, CHOP, OHSU, Stanford,
 //          eLife, Nature Communications, Human Gene Therapy, Frontiers, ClinicalTrials.gov
 
 export type ResearchGroup =
-  | 'essential'         // Pinned at top — always-current foundational reference
   | 'breakthroughs'     // Latest peer-reviewed or institutional findings (last ~12 months)
   | 'programs-trials'   // Active research programs, clinics, registries, trials
   | 'family-platform'   // Adjacent NBIA disorders + platform reads informing BPAN
@@ -24,20 +23,6 @@ export interface ResearchArticle {
 }
 
 export const researchArticles: ResearchArticle[] = [
-  // ─────────────────────────────────────────────────────────────────────────
-  // ESSENTIAL RESOURCE (pinned spotlight at top)
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: 'nbia-medical-information-resource',
-    title: 'NBIA Disorders Association Medical Information Hub',
-    date: 'Essential Resource',
-    description:
-      'Comprehensive medical information about BPAN and related NBIA disorders, including symptom management, clinical care guidelines, and treatment options. Maintained by the NBIA Disorders Association and updated as clinical evidence evolves.',
-    sourceText: 'NBIA Disorders Association',
-    sourceUrl: 'https://nbiadisorders.org/19-medical-information',
-    group: 'essential',
-  },
-
   // ─────────────────────────────────────────────────────────────────────────
   // LATEST BREAKTHROUGHS (last 12 months — BPAN-direct, peer-reviewed or
   // major institutional milestone)
@@ -237,7 +222,7 @@ export const researchArticles: ResearchArticle[] = [
 ];
 
 // Last updated timestamp
-export const lastUpdated = 'June 23, 2026';
+export const lastUpdated = 'June 24, 2026';
 
 // Update notes for content managers
 export const updateInstructions = `
@@ -245,7 +230,6 @@ RESEARCH SECTION UPDATE GUIDE
 Last refresh: June 23, 2026 (PR #24 — full content restructure)
 
 STRUCTURE:
-- essential       \u2192 Pinned spotlight at top (always 1 item: NBIA Medical Info Hub)
 - breakthroughs   \u2192 Latest peer-reviewed / institutional milestones (~3 items, <12 months old)
 - programs-trials \u2192 Active programs, clinics, registries (~3-4 items)
 - family-platform \u2192 NBIA-family & platform reads informing BPAN (~3 items)
