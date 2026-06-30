@@ -65,6 +65,23 @@ app.use(
 app.use(cors());
 app.use(express.json({ limit: '32kb' }));
 
+// Canonical host redirect. Once the apex `laneysworld.com` is added as a
+// custom domain in Railway (Porkbun ALIAS / Railway-issued cert), traffic
+// reaching this server with a non-www host gets 301'd to the canonical
+// `https://www.laneysworld.com` equivalent. The health check is exempt so
+// Railway's load-balancer probe still returns 200 on the apex hostname.
+const CANONICAL_HOST = 'www.laneysworld.com';
+const APEX_HOSTS = new Set(['laneysworld.com']);
+app.use((req, res, next) => {
+  if (req.path === '/health') return next();
+  // Express strips the port; req.hostname is just the bare hostname.
+  if (APEX_HOSTS.has(req.hostname)) {
+    const target = `https://${CANONICAL_HOST}${req.originalUrl}`;
+    return res.redirect(301, target);
+  }
+  next();
+});
+
 app.get('/health', async (_req, res) => {
   // Lightweight liveness check. Always returns 200 if the Node process is up.
   // DB connectivity is reported but does NOT fail the health check — we don't
