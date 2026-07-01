@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import helmet from 'helmet';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -61,6 +62,11 @@ app.use(
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }),
 );
+
+// gzip / brotli compression for all responses. Ships before other
+// middleware so 301 redirects and static assets both benefit. `compression`
+// automatically negotiates the best supported encoding via Accept-Encoding.
+app.use(compression());
 
 app.use(cors());
 app.use(express.json({ limit: '32kb' }));
@@ -205,6 +211,11 @@ if (fs.existsSync(distDir)) {
       index: false,
     }),
   );
+  // Root-level static files. Version-busted assets (og-image.jpg, favicons,
+  // brand PNGs, sitemap.xml, robots.txt) get a 1-year cache since their URLs
+  // change when the content does. index.html and any HTML fallback stay at
+  // no-cache so deployments are picked up immediately.
+  const VERSIONED_STATIC_EXT = /\.(?:jpg|jpeg|png|svg|webp|ico|xml|txt|woff2?|ttf|otf)$/i;
   app.use(
     express.static(distDir, {
       maxAge: '5m',
@@ -212,6 +223,8 @@ if (fs.existsSync(distDir)) {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('index.html')) {
           res.setHeader('Cache-Control', 'no-cache');
+        } else if (VERSIONED_STATIC_EXT.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
       },
     }),
