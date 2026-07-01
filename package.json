@@ -88,6 +88,7 @@
     "clsx@2.1.1": "npm:clsx@2.1.1",
     "cmdk": "1.1.1",
     "cmdk@1.1.1": "npm:cmdk@1.1.1",
+    "compression": "^1.8.1",
     "date-fns": "3.6.0",
     "date-fns@3.6.0": "npm:date-fns@3.6.0",
     "embla-carousel-react": "8.6.0",
