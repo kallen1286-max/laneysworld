@@ -17,6 +17,26 @@ const PORT = process.env.PORT || 3001;
 const NOTIFICATION_TO =
   process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
 
+// /feedback field limits. The feedback body is attacker-controlled and gets
+// embedded in an HTML email — cap sizes so a single request can't blow up
+// the notification email regardless of the escaping below.
+const FEEDBACK_MAX_NAME_LEN = 200;
+const FEEDBACK_MAX_MESSAGE_LEN = 5000;
+// RFC 5321-ish, permissive-but-sane email format check. This is not meant to
+// guarantee deliverability — it just rejects obviously malformed input before
+// it's used as the outbound email's Reply-To and rendered in the HTML body.
+const EMAIL_RE = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
+
+const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+/** Escape a string for safe interpolation into HTML markup. */
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
+}
+/** Strip control/newline characters so a field can't inject extra email headers. */
+function stripControlChars(str) {
+  return String(str).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ');
+}
+
 // Security headers. Content-Security-Policy is hand-tuned for the resources this
 // page actually uses: Google Analytics, YouTube nocookie embed, Resend API, and
 // inline styles produced by Vite/Tailwind. Tighten further when new third-party
@@ -113,14 +133,19 @@ app.post('/feedback', async (req, res) => {
     if (!feedback?.trim()) {
       return res.status(400).json({ error: 'Feedback message is required.' });
     }
+    if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
 
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8);
     const feedbackId = `feedback_${timestamp}_${randomStr}`;
 
-    const displayName = name?.trim() || 'Anonymous';
+    const displayName =
+      (typeof name === 'string' && stripControlChars(name.trim()).slice(0, FEEDBACK_MAX_NAME_LEN)) ||
+      'Anonymous';
     const senderEmail = email.trim();
-    const message = feedback.trim();
+    const message = feedback.trim().slice(0, FEEDBACK_MAX_MESSAGE_LEN);
 
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
@@ -129,6 +154,14 @@ app.post('/feedback', async (req, res) => {
         dateStyle: 'full',
         timeStyle: 'short',
       });
+
+      // displayName/senderEmail/message are attacker-controlled (submitted by any
+      // unauthenticated visitor) and get rendered as HTML in an email opened by a
+      // human — escape them so injected markup/links can't spoof or alter the
+      // notification email's content.
+      const safeDisplayName = escapeHtml(displayName);
+      const safeSenderEmail = escapeHtml(senderEmail);
+      const safeMessage = escapeHtml(message);
 
       const emailHtml = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
@@ -140,19 +173,19 @@ app.post('/feedback', async (req, res) => {
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
             <tr>
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #374151; width: 72px; vertical-align: top;">From</td>
-              <td style="padding: 10px 0; font-size: 14px; color: #111827; vertical-align: top;">${displayName}</td>
+              <td style="padding: 10px 0; font-size: 14px; color: #111827; vertical-align: top;">${safeDisplayName}</td>
             </tr>
             <tr>
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #374151; vertical-align: top;">Email</td>
               <td style="padding: 10px 0; font-size: 14px; vertical-align: top;">
-                <a href="mailto:${senderEmail}" style="color: #2563eb; text-decoration: none;">${senderEmail}</a>
+                <a href="mailto:${safeSenderEmail}" style="color: #2563eb; text-decoration: none;">${safeSenderEmail}</a>
               </td>
             </tr>
           </table>
 
           <div style="background: #f0f7ff; border-left: 4px solid #2563eb; border-radius: 6px; padding: 18px 20px;">
             <p style="margin: 0 0 6px; font-size: 12px; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em;">Message</p>
-            <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+            <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.6; white-space: pre-wrap;">${safeMessage}</p>
           </div>
 
           <p style="margin-top: 28px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 16px;">
