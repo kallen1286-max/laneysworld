@@ -14,17 +14,36 @@ const distDir = path.resolve(__dirname, '..', 'dist');
 
 const app = express();
 // Railway terminates TLS and proxies to this container through its edge
-// network before the request reaches us. The number of internal hops isn't
-// stable (Railway has been rolling out an additional CDN layer, and their
-// own docs say hop count "typically" is 1 but can vary), so trusting a fixed
-// hop count (`trust proxy: 1`) is fragile — if the real path has 2 hops, Express
-// resolves req.ip to an intermediate Railway proxy address instead of the
-// client, which silently breaks IP-based rate limiting. Instead, trust by CIDR:
-// Railway's internal network consistently uses the 100.64.0.0/10 (CGNAT) range
-// for its proxy hops, so any hop in that range is treated as trusted, and
-// Express walks X-Forwarded-For right-to-left until it finds the first address
-// outside that range — which is the true client IP regardless of hop count.
-app.set('trust proxy', '100.64.0.0/10');
+// network. Confirmed live (2026-07-15) via a temporary /__debug_ip probe that
+// Railway's X-Forwarded-For has the shape:
+//   X-Forwarded-For: <real client IP>, <rotating Railway edge/CDN IP>
+// The rightmost entry rotates per-request (it's Railway's own edge layer, not
+// a stable per-connection proxy), so Express's standard right-to-left/CIDR-trust
+// walk (`trust proxy: N` or a trusted-CIDR string) lands on that rotating edge
+// IP instead of the client — which silently breaks IP-based rate limiting
+// (every request appears to come from a different "client"). Railway's own
+// guidance confirms this: take the LEFTMOST X-Forwarded-For entry as the real
+// client IP. We disable Express's built-in derivation and read X-Forwarded-For
+// ourselves in getClientIp() below, applied wherever we need a stable per-
+// client identity (currently: the /feedback rate limiter).
+app.set('trust proxy', false);
+
+/**
+ * Resolve the real client IP behind Railway's edge. Railway's proxy always
+ * sets X-Forwarded-For as "<client>, <railway-edge-hop>" and does not allow
+ * clients to override it (confirmed via Railway's help docs), so the
+ * leftmost entry is safe to trust here even without walking a proxy chain
+ * ourselves. Falls back to the raw socket address if the header is somehow
+ * absent (e.g. local dev without a proxy in front).
+ */
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (typeof xff === 'string' && xff.trim()) {
+    const first = xff.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  return req.socket.remoteAddress;
+}
 const PORT = process.env.PORT || 3001;
 const NOTIFICATION_TO =
   process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
@@ -153,19 +172,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// TEMP DEBUG — will be removed in a fast follow-up once trust-proxy config
-// is confirmed correct against Railway's real proxy chain. No sensitive data
-// exposed — only request metadata already visible to any HTTP client.
-app.get('/__debug_ip', (req, res) => {
-  res.json({
-    ip: req.ip,
-    ips: req.ips,
-    xff: req.headers['x-forwarded-for'],
-    xrealip: req.headers['x-real-ip'],
-    remoteAddress: req.socket.remoteAddress,
-  });
-});
-
 app.get('/health', async (_req, res) => {
   // Lightweight liveness check. Always returns 200 if the Node process is up.
   // DB connectivity is reported but does NOT fail the health check — we don't
@@ -183,7 +189,7 @@ app.post('/e', handleIngest);
 
 app.post('/feedback', async (req, res) => {
   try {
-    if (!feedbackRateLimitOk(req.ip)) {
+    if (!feedbackRateLimitOk(getClientIp(req))) {
       return res.status(429).json({ error: 'Too many requests. Please try again later.' });
     }
     maybeFeedbackJanitor();
