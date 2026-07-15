@@ -13,11 +13,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.resolve(__dirname, '..', 'dist');
 
 const app = express();
-// Railway terminates TLS and proxies to this container over one internal hop,
-// so req.ip / req.hostname should trust exactly that one hop's X-Forwarded-*
-// headers rather than reporting Railway's internal proxy address for every
-// request. Needed for the /feedback rate limiter below to key on real client IPs.
-app.set('trust proxy', 1);
+// Railway terminates TLS and proxies to this container through its edge
+// network before the request reaches us. The number of internal hops isn't
+// stable (Railway has been rolling out an additional CDN layer, and their
+// own docs say hop count "typically" is 1 but can vary), so trusting a fixed
+// hop count (`trust proxy: 1`) is fragile — if the real path has 2 hops, Express
+// resolves req.ip to an intermediate Railway proxy address instead of the
+// client, which silently breaks IP-based rate limiting. Instead, trust by CIDR:
+// Railway's internal network consistently uses the 100.64.0.0/10 (CGNAT) range
+// for its proxy hops, so any hop in that range is treated as trusted, and
+// Express walks X-Forwarded-For right-to-left until it finds the first address
+// outside that range — which is the true client IP regardless of hop count.
+app.set('trust proxy', '100.64.0.0/10');
 const PORT = process.env.PORT || 3001;
 const NOTIFICATION_TO =
   process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
@@ -144,6 +151,19 @@ app.use((req, res, next) => {
     return res.redirect(301, target);
   }
   next();
+});
+
+// TEMP DEBUG — will be removed in a fast follow-up once trust-proxy config
+// is confirmed correct against Railway's real proxy chain. No sensitive data
+// exposed — only request metadata already visible to any HTTP client.
+app.get('/__debug_ip', (req, res) => {
+  res.json({
+    ip: req.ip,
+    ips: req.ips,
+    xff: req.headers['x-forwarded-for'],
+    xrealip: req.headers['x-real-ip'],
+    remoteAddress: req.socket.remoteAddress,
+  });
 });
 
 app.get('/health', async (_req, res) => {
