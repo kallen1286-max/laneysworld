@@ -13,6 +13,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.resolve(__dirname, '..', 'dist');
 
 const app = express();
+// Railway terminates TLS and proxies to this container over one internal hop,
+// so req.ip / req.hostname should trust exactly that one hop's X-Forwarded-*
+// headers rather than reporting Railway's internal proxy address for every
+// request. Needed for the /feedback rate limiter below to key on real client IPs.
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3001;
 const NOTIFICATION_TO =
   process.env.FEEDBACK_NOTIFICATION_TO || 'kallen1286@gmail.com';
@@ -26,6 +31,39 @@ const FEEDBACK_MAX_MESSAGE_LEN = 5000;
 // guarantee deliverability — it just rejects obviously malformed input before
 // it's used as the outbound email's Reply-To and rendered in the HTML body.
 const EMAIL_RE = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
+
+// -- Rate limiting (in-memory token bucket per client IP) -------------------
+// /feedback is public and unauthenticated, and every accepted request fires a
+// real, billable outbound email via Resend to the site admin's inbox. Without
+// a limit, a scripted attacker can mail-bomb the admin and burn Resend quota
+// indefinitely. Mirrors the token-bucket approach already used for POST /e
+// (server/ingest.mjs), keyed on IP instead of anon_id since this endpoint has
+// no cookie. 5 requests burst, refilling at 5 per 15 minutes — generous for a
+// real visitor, well below what makes mail-bombing or quota exhaustion viable.
+const FEEDBACK_RATE_CAPACITY = 5;
+const FEEDBACK_RATE_WINDOW_MS = 15 * 60 * 1000;
+const FEEDBACK_RATE_REFILL_PER_MS = FEEDBACK_RATE_CAPACITY / FEEDBACK_RATE_WINDOW_MS;
+const feedbackBuckets = new Map(); // ip -> { tokens, last }
+function feedbackRateLimitOk(ip) {
+  const now = Date.now();
+  let b = feedbackBuckets.get(ip);
+  if (!b) {
+    b = { tokens: FEEDBACK_RATE_CAPACITY, last: now };
+    feedbackBuckets.set(ip, b);
+  }
+  const elapsed = now - b.last;
+  b.tokens = Math.min(FEEDBACK_RATE_CAPACITY, b.tokens + elapsed * FEEDBACK_RATE_REFILL_PER_MS);
+  b.last = now;
+  if (b.tokens < 1) return false;
+  b.tokens -= 1;
+  return true;
+}
+// Light janitor so the map can't grow unbounded under a distributed attack.
+function maybeFeedbackJanitor() {
+  if (feedbackBuckets.size < 5000) return;
+  const cutoff = Date.now() - FEEDBACK_RATE_WINDOW_MS;
+  for (const [k, v] of feedbackBuckets) if (v.last < cutoff) feedbackBuckets.delete(k);
+}
 
 const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 /** Escape a string for safe interpolation into HTML markup. */
@@ -125,6 +163,11 @@ app.post('/e', handleIngest);
 
 app.post('/feedback', async (req, res) => {
   try {
+    if (!feedbackRateLimitOk(req.ip)) {
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+    maybeFeedbackJanitor();
+
     const { name, email, feedback } = req.body ?? {};
 
     if (!email?.trim()) {
